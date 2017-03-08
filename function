@@ -62,8 +62,13 @@ todo() {
     elif [[ "$1" == "-r" ]]; then
         nl -b a "$HOME/.todo" | less
         eval printf %.0s- '{1..'"${COLUMNS:-$(tput cols)}"\}; echo
-        read -p "Type a number to remove: " number
+        read -p "Type a number to check: " number
         sed -i "${number} s/\[ \]/[x]/" "$HOME/.todo"
+    elif [[ "$1" == "-d" ]]; then
+	nl -b a "$HOME/.todo" | less
+	eval printf %.0s- '{1..'"${COLUMNS:-$(tput cols)}"\}; echo
+	read -p "Type a number to delete: " number
+	sed -i ${number}d "$HOME/.todo"
     else
 	# Add item
         printf "%s\n" "[ ] ${*}" >> "$HOME/.todo"
