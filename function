@@ -1,0 +1,193 @@
+#!/bin/bash
+#
+# ~/.function
+#
+
+# Create a directory and immediately move into it
+mcd() {
+	mkdir -p $1
+	cd $1
+}
+
+# Change directory and list contained files
+cl() {
+	local dir="$1"
+	local dir="${dir:=$HOME}"
+	if [[ -d "$dir" ]]; then
+		cd "$dir" >/dev/null; ls -lh
+	else
+		echo "bash: cl: $dir: Directory not found"
+	fi
+}
+
+# Run RDP with configuration file specified
+#
+# argument is the file - required
+rdp() {
+	local DEFAULT_FILE=".rdp_WSM8-0089"
+	local FILE="${1:-${DEFAULT_FILE}}"
+
+	cat "$FILE" | xargs -rd $'\n' xfreerdp
+}
+
+# Run VPN connection with configuration file specified
+# 
+# Arguments:
+# 	file - optional
+# 	server - required
+vpn() {
+	local DEFAULT_SERVER="ras01.netcracker.com"
+
+	for i in "$@"; do
+		[ -f $i ] && local FILE="$i" || local SERVER="$i"		
+	done
+
+	sudo openconnect --config=${FILE} ${SERVER:=${DEFAULT_SERVER}}
+}  
+
+# Simple TODO
+todo() {
+    if [[ ! -f $HOME/.todo ]]; then
+        touch "$HOME/.todo"
+    fi
+
+    if ! (($#)); then
+	cat "$HOME/.todo" | less
+    elif [[ "$1" == "-l" ]]; then
+        # List items wih numbers
+	nl -b a "$HOME/.todo" | less
+    elif [[ "$1" == "-c" ]]; then
+        # Clear the file
+	> $HOME/.todo
+    elif [[ "$1" == "-r" ]]; then
+        nl -b a "$HOME/.todo" | less
+        eval printf %.0s- '{1..'"${COLUMNS:-$(tput cols)}"\}; echo
+        read -p "Type a number to remove: " number
+        sed -i "${number} s/\[ \]/[x]/" "$HOME/.todo"
+    else
+	# Add item
+        printf "%s\n" "[ ] ${*}" >> "$HOME/.todo"
+    fi
+}
+
+# Decompress any compressed file format
+extract() {
+ if [ -z "$1" ]; then
+    # display usage if no parameters given
+    echo "Usage: extract <path/file_name>.<zip|rar|bz2|gz|tar|tbz2|tgz|Z|7z|xz|ex|tar.bz2|tar.gz|tar.xz>"
+    echo "       extract <path/file_name_1.ext> [path/file_name_2.ext] [path/file_name_3.ext]"
+    return 1
+ else
+    for n in $@
+    do
+      if [ -f "$n" ] ; then
+          case "${n%,}" in
+            *.tar.bz2|*.tar.gz|*.tar.xz|*.tbz2|*.tgz|*.txz|*.tar) 
+                         tar xvf "$n"       ;;
+            *.lzma)      unlzma ./"$n"      ;;
+            *.bz2)       bunzip2 ./"$n"     ;;
+            *.rar)       unrar x -ad ./"$n" ;;
+            *.gz)        gunzip ./"$n"      ;;
+            *.zip)       unzip ./"$n"       ;;
+            *.z)         uncompress ./"$n"  ;;
+            *.7z)        7z x ./"$n"        ;;
+            *.xz)        unxz ./"$n"        ;;
+            *.exe)       cabextract ./"$n"  ;;
+            *)
+                         echo "extract: '$n' - unknown archive method"
+                         return 1
+                         ;;
+          esac
+      else
+          echo "'$n' - file does not exist"
+          return 1
+      fi
+    done
+fi
+}
+
+# Compile and execute a C source on the fly
+csource() {
+	[[ $1 ]]    || { echo "Missing operand" >&2; return 1; }
+	[[ -r $1 ]] || { printf "File %s does not exist or is not readable\n" "$1" >&2; return 1; }
+	local output_path=${TMPDIR:-/tmp}/${1##*/};
+	gcc "$1" -o "$output_path" && "$output_path";
+	rm "$output_path";
+	return 0;
+}
+
+# Calculator
+calc() {
+    echo "scale=3;$@" | bc -l
+}
+
+# Find by name
+ff() { find . -name $@ -print; }
+
+# Kill process by name
+kp() {
+  ps aux | grep $1 > /dev/null
+  mypid=$(pidof $1)
+  if [ "$mypid" != "" ]; then
+    kill -9 $(pidof $1)
+    if [[ "$?" == "0" ]]; then
+      echo "PID $mypid ($1) killed."
+    fi
+  else
+    echo "None killed."
+  fi
+  return;
+}
+
+# Get common xpath part for attributes and nodes
+# Parse input parameters into path nodes for xpath
+#
+# INPUT:
+# Provide any number of word-parameters to the script
+# 
+# OUTPUT:
+# The result would be multiple strings corresponding found records
+keys() {
+  local FILE=~/keys.xml
+
+  local xpath_base=""
+  for i in "$@"; do
+    xpath_base="${xpath_base}/*[starts-with(name(), '${i}')]/"
+  done
+  xpath_base="${xpath_base}/keys"
+
+  # Get full command for extracting particular part, whether attribute or node
+  # 
+  # INPUT:
+  # $1 = 'attr' / 'node'
+  # $2 = file
+  #
+  # OUTPUT:
+  # string
+  extract_xpath() {
+    case $1 in 
+      'attr')
+        local grep_case='".*"'
+        local fs_case='"'
+        ;;
+      'node')
+        local grep_case='>.*<'
+        local fs_case='<|>'
+        ;;
+      *)
+        echo "Wrong parameter"
+        ;;
+    esac
+
+    echo cat "$xpath_base" | xmllint --shell "$2" | sed '/-\+/d' | egrep -o "$grep_case" | tr -d "$fs_case" 
+  }
+
+  mapfile -t local attributes < <(extract_xpath attr "$FILE")
+  mapfile -t local values < <(extract_xpath node "$FILE")
+
+  for (( c=0; c<${#attributes[@]}; c++ )); do
+    echo "${attributes[$c]}: ${values[$c]}"
+  done
+}
+
+
