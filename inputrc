@@ -1,2 +1,6 @@
+# 
+# ~/.inputrc
+#
+
 # Change double tab to a single tab
 set show-all-if-unmodified on
