@@ -4,13 +4,15 @@
 #
 
 # Create a directory and immediately move into it
-mcd() {
+mcd()
+{
 	mkdir -p $1
 	cd $1
 }
 
 # Change directory and list contained files
-cl() {
+cl()
+{
 	local dir="$1"
 	local dir="${dir:=$HOME}"
 	if [[ -d "$dir" ]]; then
@@ -23,7 +25,8 @@ cl() {
 # Run RDP with configuration file specified
 #
 # argument is the file - required
-rdp() {
+rdp()
+{
 	local DEFAULT_FILE=".rdp_WSM8-0089"
 	local FILE="${1:-${DEFAULT_FILE}}"
 
@@ -35,7 +38,8 @@ rdp() {
 # Arguments:
 # 	file - optional
 # 	server - required
-vpn() {
+vpn()
+{
 	local DEFAULT_SERVER="ras01.netcracker.com"
 
 	for i in "$@"; do
@@ -46,37 +50,65 @@ vpn() {
 }  
 
 # Simple TODO
-todo() {
-    if [[ ! -f $HOME/.todo ]]; then
-        touch "$HOME/.todo"
-    fi
+todo()
+{
+	
+  local FILE="$HOME/.todo"
+				
+  if [[ ! -f "$FILE" ]]; then
+    touch "$FILE"
+  fi
 
-    if ! (($#)); then
-	cat "$HOME/.todo" | less
-    elif [[ "$1" == "-l" ]]; then
-        # List items wih numbers
-	nl -b a "$HOME/.todo" | less
-    elif [[ "$1" == "-c" ]]; then
-        # Clear the file
-	> $HOME/.todo
-    elif [[ "$1" == "-r" ]]; then
-        nl -b a "$HOME/.todo" | less
-        eval printf %.0s- '{1..'"${COLUMNS:-$(tput cols)}"\}; echo
-        read -p "Type a number to check: " number
-        sed -i "${number} s/\[ \]/[x]/" "$HOME/.todo"
-    elif [[ "$1" == "-d" ]]; then
-	nl -b a "$HOME/.todo" | less
-	eval printf %.0s- '{1..'"${COLUMNS:-$(tput cols)}"\}; echo
-	read -p "Type a number to delete: " number
-	sed -i ${number}d "$HOME/.todo"
-    else
-	# Add item
-        printf "%s\n" "[ ] ${*}" >> "$HOME/.todo"
-    fi
+  if ! (($#)); then
+	  cat "$FILE" | less
+  elif [[ "$1" == "-l" ]]; then
+    # List items wih numbers
+	  nl -b a "$FILE" | less
+  elif [[ "$1" == "-c" ]]; then
+    # Clear the file
+	  > $FILE
+  elif [[ "$1" == "-d" ]]; then
+    nl -b a "$FILE" | less
+    eval printf %.0s- '{1..'"${COLUMNS:-$(tput cols)}"\}; echo
+    read -p "Type a number to do: " number
+    sed -i "${number} s/\[ \]/[x]/" "$FILE"
+  elif [[ "$1" == "-u" ]]; then
+    nl -b a "$FILE" | less
+    eval printf %.0s- '{1..'"${COLUMNS:-$(tput cols)}"\}; echo
+    read -p "Type a number to undo: " number
+    sed -i "${number} s/\[x\]/[ ]/" "$FILE"
+  elif [[ "$1" == "-r" ]]; then
+	  nl -b a "$FILE" | less
+	  eval printf %.0s- '{1..'"${COLUMNS:-$(tput cols)}"\}; echo
+	  read -p "Type a number to remove: " number
+	  sed -i ${number}d "$FILE"
+  else
+	  # Add item
+    printf "%s\n" "[ ] ${*}" >> "$FILE"
+  fi
+}
+
+# TODO solutions
+solution()
+{
+  local FILE="$HOME/.solution"
+
+  if [[ ! -f "$FILE" ]]; then
+    touch "$FILE"
+  fi
+
+  if (("$@")); then
+		sed -n "${@}p" "$FILE"
+	else
+    # List items wih numbers
+	  nl -b a "$FILE" | less
+	fi
+	
 }
 
 # Decompress any compressed file format
-extract() {
+extract()
+{
  if [ -z "$1" ]; then
     # display usage if no parameters given
     echo "Usage: extract <path/file_name>.<zip|rar|bz2|gz|tar|tbz2|tgz|Z|7z|xz|ex|tar.bz2|tar.gz|tar.xz>"
@@ -112,7 +144,8 @@ fi
 }
 
 # Compile and execute a C source on the fly
-csource() {
+csource()
+{
 	[[ $1 ]]    || { echo "Missing operand" >&2; return 1; }
 	[[ -r $1 ]] || { printf "File %s does not exist or is not readable\n" "$1" >&2; return 1; }
 	local output_path=${TMPDIR:-/tmp}/${1##*/};
@@ -194,5 +227,3 @@ keys() {
     echo "${attributes[$c]}: ${values[$c]}"
   done
 }
-
-
