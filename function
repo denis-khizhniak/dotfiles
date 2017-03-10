@@ -6,20 +6,20 @@
 # Create a directory and immediately move into it
 mcd()
 {
-	mkdir -p $1
-	cd $1
+  mkdir -p $1
+  cd $1
 }
 
 # Change directory and list contained files
 cl()
 {
-	local dir="$1"
-	local dir="${dir:=$HOME}"
-	if [[ -d "$dir" ]]; then
-		cd "$dir" >/dev/null; ls -lh
-	else
-		echo "bash: cl: $dir: Directory not found"
-	fi
+  local dir="$1"
+  local dir="${dir:=$HOME}"
+  if [[ -d "$dir" ]]; then
+    cd "$dir" >/dev/null; ls -lh
+  else
+    echo "bash: cl: $dir: Directory not found"
+  fi
 }
 
 # Run RDP with configuration file specified
@@ -27,83 +27,119 @@ cl()
 # argument is the file - required
 rdp()
 {
-	local DEFAULT_FILE=".rdp_WSM8-0089"
-	local FILE="${1:-${DEFAULT_FILE}}"
+  local DEFAULT_FILE=".rdp_WSM8-0089"
+  local FILE="${1:-${DEFAULT_FILE}}"
 
-	cat "$FILE" | xargs -rd $'\n' xfreerdp
+  cat "$FILE" | xargs -rd $'\n' xfreerdp
 }
 
 # Run VPN connection with configuration file specified
 # 
 # Arguments:
-# 	file - optional
-# 	server - required
+#   file - optional
+#   server - required
 vpn()
 {
-	local DEFAULT_SERVER="ras01.netcracker.com"
+  local DEFAULT_SERVER="ras01.netcracker.com"
 
-	for i in "$@"; do
-		[ -f $i ] && local FILE="$i" || local SERVER="$i"		
-	done
+  for i in "$@"; do
+    [ -f $i ] && local FILE="$i" || local SERVER="$i"    
+  done
 
-	sudo openconnect --config=${FILE} ${SERVER:=${DEFAULT_SERVER}}
+  sudo openconnect --config=${FILE} ${SERVER:=${DEFAULT_SERVER}}
 }  
+
+
+# $1 = todo number
+get_solution_line_num()
+{
+	echo $(cat "$MAP" | awk -F ';' -v todo="$1" '$1 == var {print $2}') 
+}
+
+# TODO solutions
+solution()
+{
+
+	local DIR="$HOME/Projects/dotfiles"
+	local FILE="solution"
+	local MAP="map_solution"
+
+	if [[ ! -f "$FILE" ]]; then
+		touch "$FILE"
+	fi
+	if [[ ! -f "$MAP" ]]; then
+		touch "$MAP"
+	fi
+
+	# Create symlinks (force)
+  ln -sv "$FILE"	
+
+	if (("$1")); then
+		local number=$(get_solution_line_num "$1")
+		local result=$(sed -n "${number}p" "$FILE")
+	  ! ((${#result})) && echo "No matched solutions!" || echo "$result"
+	elif [[ "$1" == "-a" ]]; then
+		# Add item
+	  read -p "Enter your solution: " result
+		printf "%s\n" "${result}" >> "$FILE"
+		local lines_num=$(cat "$FILE" | wc -l)
+		printf "%s\n" "${2};${lines_num}" >> "$MAP"
+	elif [[ "$1" == "-r" ]]; then
+		# Remove solution
+		local number=$(get_solution_line_num "$2")
+		sed -i ${number}d "$FILE"    
+		sed -i "/${2};/d" "$MAP"
+	else
+		# List items wih numbers
+		nl -b a "$FILE" | less
+	fi 
+}
 
 # Simple TODO
 todo()
 {
-	
+
   local FILE="$HOME/.todo"
-				
+        
   if [[ ! -f "$FILE" ]]; then
     touch "$FILE"
   fi
 
   if ! (($#)); then
-	  cat "$FILE" | less
+    cat "$FILE" | grep '[ ]' | less
   elif [[ "$1" == "-l" ]]; then
     # List items wih numbers
-	  nl -b a "$FILE" | less
+    nl -b a "$FILE" | grep '[ ]' | less
+  elif [[ "$1" == "-a" ]]; then
+    # List all items wih numbers
+    nl -b a "$FILE" | less
   elif [[ "$1" == "-c" ]]; then
     # Clear the file
-	  > $FILE
+    > $FILE
   elif [[ "$1" == "-d" ]]; then
     nl -b a "$FILE" | less
     eval printf %.0s- '{1..'"${COLUMNS:-$(tput cols)}"\}; echo
     read -p "Type a number to do: " number
     sed -i "${number} s/\[ \]/[x]/" "$FILE"
+    read -p "Do you want to post solution (Y/n)? " answer
+    [[ ${answer,,} == "y" ]] && solution -a ${number}
+  elif [[ "$1" == "-s" ]]; then
+    (("$2")) && solution "$2" || solution
   elif [[ "$1" == "-u" ]]; then
     nl -b a "$FILE" | less
     eval printf %.0s- '{1..'"${COLUMNS:-$(tput cols)}"\}; echo
     read -p "Type a number to undo: " number
     sed -i "${number} s/\[x\]/[ ]/" "$FILE"
   elif [[ "$1" == "-r" ]]; then
-	  nl -b a "$FILE" | less
-	  eval printf %.0s- '{1..'"${COLUMNS:-$(tput cols)}"\}; echo
-	  read -p "Type a number to remove: " number
-	  sed -i ${number}d "$FILE"
+    nl -b a "$FILE" | less
+    eval printf %.0s- '{1..'"${COLUMNS:-$(tput cols)}"\}; echo
+    read -p "Type a number to remove: " number
+    sed -i ${number}d "$FILE"
+    solution -r ${number}
   else
-	  # Add item
+    # Add item
     printf "%s\n" "[ ] ${*}" >> "$FILE"
   fi
-}
-
-# TODO solutions
-solution()
-{
-  local FILE="$HOME/.solution"
-
-  if [[ ! -f "$FILE" ]]; then
-    touch "$FILE"
-  fi
-
-  if (("$@")); then
-		sed -n "${@}p" "$FILE"
-	else
-    # List items wih numbers
-	  nl -b a "$FILE" | less
-	fi
-	
 }
 
 # Decompress any compressed file format
@@ -146,12 +182,12 @@ fi
 # Compile and execute a C source on the fly
 csource()
 {
-	[[ $1 ]]    || { echo "Missing operand" >&2; return 1; }
-	[[ -r $1 ]] || { printf "File %s does not exist or is not readable\n" "$1" >&2; return 1; }
-	local output_path=${TMPDIR:-/tmp}/${1##*/};
-	gcc "$1" -o "$output_path" && "$output_path";
-	rm "$output_path";
-	return 0;
+  [[ $1 ]]    || { echo "Missing operand" >&2; return 1; }
+  [[ -r $1 ]] || { printf "File %s does not exist or is not readable\n" "$1" >&2; return 1; }
+  local output_path=${TMPDIR:-/tmp}/${1##*/};
+  gcc "$1" -o "$output_path" && "$output_path";
+  rm "$output_path";
+  return 0;
 }
 
 # Calculator
@@ -186,7 +222,7 @@ kp() {
 # OUTPUT:
 # The result would be multiple strings corresponding found records
 keys() {
-  local FILE=~/keys.xml
+  local FILE="$HOME"/keys.xml
 
   local xpath_base=""
   for i in "$@"; do
