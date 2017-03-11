@@ -4,3 +4,6 @@
 
 # Change double tab to a single tab
 set show-all-if-unmodified on
+
+# Enable DEL key in applications
+set enable-keypad on
