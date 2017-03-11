@@ -2,6 +2,13 @@
 " ~/.vimrc
 """""""""""""""""""""""""""""""""""
 
+set nocompatible                " use Vim defaults instead of 100% vi compatibility
+set backspace=indent,eol,start  " more powerful backspacing
+
+set nobackup                    " do not keep a backup file, use versions instead
+
+syntax on                       " enable syntax highlighting
+
 " With a map leader it's possible to do extra key combinations
 " like <leader>w saves the current file
 let mapleader = ","
