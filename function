@@ -53,92 +53,107 @@ vpn()
 # $1 = todo number
 get_solution_line_num()
 {
-	echo $(cat "$MAP" | awk -F ';' -v todo="$1" '$1 == var {print $2}') 
+  echo $(cat "$MAP_LN" | awk -F ';' -v todo="$1" '$1 == todo {print $2}') 
 }
 
 # TODO solutions
 solution()
 {
+  local DIR="${HOME}/Projects/dotfiles"
+  local FILE="solution"
+  local MAP="map_solution"
+  local MAP_LN="${HOME}/.${MAP}"
+  local FILE_LN="${HOME}/.${FILE}"
 
-	local DIR="$HOME/Projects/dotfiles"
-	local FILE="solution"
-	local MAP="map_solution"
+  if [[ ! -f "${DIR}/${FILE}" ]]; then
+    touch "${DIR}/${FILE}"
+  fi
+  if [[ ! -f "${DIR}/${MAP}" ]]; then
+    touch "${DIR}/${MAP}"
+  fi
 
-	if [[ ! -f "$FILE" ]]; then
-		touch "$FILE"
-	fi
-	if [[ ! -f "$MAP" ]]; then
-		touch "$MAP"
-	fi
+  # Create symlinks (force)
+  ln -sf "${DIR}/${FILE}" "${FILE_LN}"
+  ln -sf "${DIR}/${MAP}" "${MAP_LN}"
 
-	# Create symlinks (force)
-  ln -sv "$FILE"	
-
-	if (("$1")); then
-		local number=$(get_solution_line_num "$1")
-		local result=$(sed -n "${number}p" "$FILE")
-	  ! ((${#result})) && echo "No matched solutions!" || echo "$result"
-	elif [[ "$1" == "-a" ]]; then
-		# Add item
-	  read -p "Enter your solution: " result
-		printf "%s\n" "${result}" >> "$FILE"
-		local lines_num=$(cat "$FILE" | wc -l)
-		printf "%s\n" "${2};${lines_num}" >> "$MAP"
-	elif [[ "$1" == "-r" ]]; then
-		# Remove solution
-		local number=$(get_solution_line_num "$2")
-		sed -i ${number}d "$FILE"    
-		sed -i "/${2};/d" "$MAP"
-	else
-		# List items wih numbers
-		nl -b a "$FILE" | less
-	fi 
+  if (("$1")); then
+    local number=$(get_solution_line_num "$1")
+    local result=$(sed -n "${number}p" "$FILE_LN")
+    ! ((${#result})) && echo "No matched solutions!" || echo "$result"
+  elif [[ "$1" == "-a" ]]; then
+    # Add item
+    read -ep "Enter your solution: " result
+    echo "Added solution: \"$result\""
+    printf "%s\n" "$result" >> "$FILE_LN"
+    local lines_num=$(cat "$FILE_LN" | wc -l)
+    printf "%s\n" "${2};${lines_num}" >> "$MAP_LN"
+  elif [[ "$1" == "-r" ]]; then
+    # Remove solution
+    local number=$(get_solution_line_num "$2")
+    if (("$number")); then
+      echo "Removed solution: \"$(sed -n ${number}p "$FILE_LN")\""
+      sed -i --follow-symlinks ${number}d "$FILE_LN"
+      sed -i --follow-symlinks "/${2};/d" "$MAP_LN"
+    fi
+  else
+    # List items wih numbers
+    nl -b a "$FILE_LN" | less
+  fi 
 }
 
 # Simple TODO
 todo()
 {
-
-  local FILE="$HOME/.todo"
+  local DIR="${HOME}/Projects/dotfiles"
+  local FILE="todo"
+  local FILE_LN="${HOME}/.${FILE}"
         
-  if [[ ! -f "$FILE" ]]; then
-    touch "$FILE"
+  if [[ ! -f "${DIR}/${FILE}" ]]; then
+    touch "${DIR}/${FILE}"
   fi
 
+  # Create symlinks (force)
+  ln -sf "${DIR}/${FILE}" "${FILE_LN}"
+
   if ! (($#)); then
-    cat "$FILE" | grep '[ ]' | less
+    cat "$FILE_LN" | grep '\[ \]' | less
   elif [[ "$1" == "-l" ]]; then
     # List items wih numbers
-    nl -b a "$FILE" | grep '[ ]' | less
+    nl -b a "$FILE_LN" | grep '\[ \]' | less
   elif [[ "$1" == "-a" ]]; then
     # List all items wih numbers
-    nl -b a "$FILE" | less
+    nl -b a "$FILE_LN" | less
   elif [[ "$1" == "-c" ]]; then
     # Clear the file
-    > $FILE
+    > "$FILE_LN"
   elif [[ "$1" == "-d" ]]; then
-    nl -b a "$FILE" | less
-    eval printf %.0s- '{1..'"${COLUMNS:-$(tput cols)}"\}; echo
+    nl -b a "$FILE_LN" | grep '\[ \]' | less
     read -p "Type a number to do: " number
-    sed -i "${number} s/\[ \]/[x]/" "$FILE"
-    read -p "Do you want to post solution (Y/n)? " answer
-    [[ ${answer,,} == "y" ]] && solution -a ${number}
+    sed -i --follow-symlinks "${number}s/\[ \]/[x]/" "$FILE_LN"
+    read -n 1 -p "Do you want to post solution (Y/n)? " answer; echo
+    [[ $answer = [Yy] ]] && solution -a "$number"
+  elif [[ "$1" == "-p" ]]; then
+    nl -b a "$FILE_LN" | less
+    read -p "Type a number to post solution for: " number
+    solution -a "$number"
   elif [[ "$1" == "-s" ]]; then
     (("$2")) && solution "$2" || solution
   elif [[ "$1" == "-u" ]]; then
-    nl -b a "$FILE" | less
-    eval printf %.0s- '{1..'"${COLUMNS:-$(tput cols)}"\}; echo
+    nl -b a "$FILE_LN" | grep '\[x\]' | less
     read -p "Type a number to undo: " number
-    sed -i "${number} s/\[x\]/[ ]/" "$FILE"
+    echo "Undone item: \"$(sed -n "${number}s/\[x\] //p" "$FILE_LN")\""
+    sed -i --follow-symlinks "${number}s/\[x\]/[ ]/" "$FILE_LN"
+    solution -r "$number"
   elif [[ "$1" == "-r" ]]; then
-    nl -b a "$FILE" | less
-    eval printf %.0s- '{1..'"${COLUMNS:-$(tput cols)}"\}; echo
+    nl -b a "$FILE_LN" | less
     read -p "Type a number to remove: " number
-    sed -i ${number}d "$FILE"
-    solution -r ${number}
+    echo "Removed item: \"$(sed -rn "${number}s/\[[x ]\] //p" "$FILE_LN")\""
+    sed -i --follow-symlinks ${number}d "$FILE_LN"
+    solution -r "$number"
   else
     # Add item
-    printf "%s\n" "[ ] ${*}" >> "$FILE"
+    echo "Added item: \"${*}\""
+    printf "%s\n" "[ ] ${*}" >> "$FILE_LN"
   fi
 }
 
