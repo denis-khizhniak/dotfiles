@@ -6,8 +6,8 @@
 [[ $- != *i* ]] && return
 
 # Source alias and functions 
-. .alias &
-. .function &
+. ~/.alias
+. ~/.function
 
 PS1='[\u@\h \W]\$ '
 
