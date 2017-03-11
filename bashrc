@@ -15,4 +15,4 @@ PS1='[\u@\h \W]\$ '
 complete -c man which
 
 # Complete command names as well as file names
-complete -f sudo
+complete -cf sudo
