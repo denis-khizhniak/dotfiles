@@ -12,10 +12,7 @@ alias perm='stat --printf "%a %n \n"'
 # ls commands
 alias l.='ls -d .*'
 alias la='ls -lah'
-alias less='/usr/share/vim/vim*/macros/less.sh'
 alias ll='ls -lh'
-alias log='journalctl -x'
-alias logerr='journalctl -xp err..alert'
 alias lr='ls -lR | less'
 alias ls='ls --color=auto'
 alias lsl='ls -lah | less'
@@ -41,6 +38,8 @@ alias psg='ps aux | grep -v grep | grep -i -e VSZ -e'
 # System management
 alias reboot='sudo reboot'
 alias mount='mount | column -t'
+alias log='journalctl -x'
+alias logerr='journalctl -xp err..alert'
 
 # Rebuild package shortcut
 alias redwm='cd ~/abs/dwm; updpkgsums; makepkg -fi --noconfirm && killall dwm'

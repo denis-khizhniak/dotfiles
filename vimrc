@@ -7,6 +7,7 @@ set backspace=indent,eol,start  " more powerful backspacing
 
 set nobackup                    " do not keep a backup file, use versions instead
 
+filetype plugin on              " enable filetype plugin
 syntax on                       " enable syntax highlighting
 
 " With a map leader it's possible to do extra key combinations
