@@ -40,9 +40,12 @@ numlockx &
 
 # Statusbar loop
 while true; do
-  ~/.dwm-status  
+  ~/.dwm-status
   sleep 1s    # Update every second
 done &
+
+# udevadm monitor for automouting block devices
+~/.udevadm_monitor &
 
 # Run dwm
 exec ~/.startdwm
