@@ -2,3 +2,4 @@
 Set enable-keypad on in .inputrc
 Console: drop-in сниппет для getty@.service; X: numlockx в xinitrc
 xsetroot, цикл в xinitrc по обновлению статуса
+udevadm monitor скрипт в xinitrc
