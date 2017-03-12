@@ -38,5 +38,11 @@ fi
 # Activate NumLock
 numlockx &
 
+# Statusbar loop
+while true; do
+  ~/.dwm-status  
+  sleep 1s    # Update every second
+done &
+
 # Run dwm
-exec dwm
+exec ~/.startdwm
