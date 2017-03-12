@@ -23,8 +23,7 @@ alias rmorphans='sudo pacman -Rs $(pacman -Qtdq)'
 alias pacman='sudo pacman'
 alias pi='sudo pacman -S'
 alias pkgfiles='sudo pacman -Qlq "$1" | grep -v / | xargs du -h | sort -h'
-alias pr='sudo pacman -R'
-alias prd='sudo pacman -Rsu'
+alias pr='sudo pacman -Rs'
 alias pu='sudo pacman -Syu'
 
 # File management
