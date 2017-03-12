@@ -1,2 +1,4 @@
 Установить alsa-utils, unmute Master канал
 Set enable-keypad on in .inputrc
+Console: drop-in сниппет для getty@.service; X: numlockx в xinitrc
+xsetroot, цикл в xinitrc по обновлению статуса
