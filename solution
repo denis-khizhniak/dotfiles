@@ -4,3 +4,4 @@ Console: drop-in сниппет для getty@.service; X: numlockx в xinitrc
 xsetroot, цикл в xinitrc по обновлению статуса
 udevadm monitor скрипт в xinitrc
 scrot, настройка dwm - сочетания клавиш для скриншотов (выделением, активного окна, рабочего стола)
+Настройка dwm сочетаний клавиш, для XF86 клавиш используются keycodes из xev
