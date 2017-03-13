@@ -158,7 +158,7 @@ todo()
 }
 
 # Decompress any compressed file format
-extract()
+extract() 
 {
  if [ -z "$1" ]; then
     # display usage if no parameters given
@@ -195,7 +195,7 @@ fi
 }
 
 # Compile and execute a C source on the fly
-csource()
+csource() 
 {
   [[ $1 ]]    || { echo "Missing operand" >&2; return 1; }
   [[ -r $1 ]] || { printf "File %s does not exist or is not readable\n" "$1" >&2; return 1; }
@@ -206,7 +206,8 @@ csource()
 }
 
 # Calculator
-calc() {
+calc() 
+{
     echo "scale=3;$@" | bc -l
 }
 
@@ -214,7 +215,8 @@ calc() {
 ff() { find . -name $@ -print; }
 
 # Kill process by name
-kp() {
+kp() 
+{
   ps aux | grep $1 > /dev/null
   mypid=$(pidof $1)
   if [ "$mypid" != "" ]; then
@@ -236,7 +238,8 @@ kp() {
 # 
 # OUTPUT:
 # The result would be multiple strings corresponding found records
-keys() {
+keys() 
+{
   local FILE="$HOME"/keys.xml
 
   local xpath_base=""
@@ -277,4 +280,16 @@ keys() {
   for (( c=0; c<${#attributes[@]}; c++ )); do
     echo "${attributes[$c]}: ${values[$c]}"
   done
+}
+
+# Colored man
+man() 
+{
+  LESS_TERMCAP_md=$'\e[01;31m' \
+  LESS_TERMCAP_me=$'\e[0m' \
+  LESS_TERMCAP_se=$'\e[0m' \
+  LESS_TERMCAP_so=$'\e[01;44;33m' \
+  LESS_TERMCAP_ue=$'\e[0m' \
+  LESS_TERMCAP_us=$'\e[01;32m' \
+  command man "$@"
 }
