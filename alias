@@ -41,7 +41,7 @@ alias log='journalctl -x'
 alias logerr='journalctl -xp err..alert'
 
 # Rebuild package shortcut
-alias redwm='cd ~/abs/dwm; updpkgsums; makepkg -fi --noconfirm && killall dwm'
+alias redwm='cd ~/Projects/dwm; updpkgsums; makepkg -fi --noconfirm && killall dwm'
 
 # Handy shortcuts
 alias x='exit'
