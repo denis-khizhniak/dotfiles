@@ -1,8 +1,10 @@
-Установить alsa-utils, unmute Master канал
-Set enable-keypad on in .inputrc
-Console: drop-in сниппет для getty@.service; X: numlockx в xinitrc
-xsetroot, цикл в xinitrc по обновлению статуса
-udevadm monitor скрипт в xinitrc
-scrot, настройка dwm - сочетания клавиш для скриншотов (выделением, активного окна, рабочего стола)
-Настройка dwm сочетаний клавиш, для XF86 клавиш используются keycodes из xev
-Установка темы Arc-Dark, настройка ее для gtk-2.0 с параметром предпочтения темного оформления, уменьшил шрифт до 10pt
+5$Установить alsa-utils, unmute Master канал
+1$Set enable-keypad on in .inputrc
+14$Console: drop-in сниппет для getty@.service; X: numlockx в xinitrc
+3$xsetroot, цикл в xinitrc по обновлению статуса
+7$udevadm monitor скрипт в xinitrc
+10$scrot, настройка dwm - сочетания клавиш для скриншотов (выделением, активного окна, рабочего стола)
+11$Настройка dwm сочетаний клавиш, для XF86 клавиш используются keycodes из xev
+17$Установка темы Arc-Dark, настройка ее для gtk-2.0 с параметром предпочтения темного оформления, уменьшил шрифт до 10pt
+10$feh --bg-scale
+13$Использование NetworkManager'a

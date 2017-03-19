@@ -34,7 +34,7 @@ rdp()
 }
 
 # Run VPN connection with configuration file specified
-# 
+#
 # Arguments:
 #   file - optional
 #   server - required
@@ -43,122 +43,118 @@ vpn()
   local DEFAULT_SERVER="ras01.netcracker.com"
 
   for i in "$@"; do
-    [ -f $i ] && local FILE="$i" || local SERVER="$i"    
+    [ -f $i ] && local FILE="$i" || local SERVER="$i"
   done
 
   sudo openconnect --config=${FILE} ${SERVER:=${DEFAULT_SERVER}}
-}  
-
-
-# $1 = todo number
-get_solution_line_num()
-{
-  echo $(cat "$MAP_LN" | awk -F ';' -v todo="$1" '$1 == todo {print $2}') 
-}
-
-# TODO solutions
-solution()
-{
-  local DIR="${HOME}/Projects/dotfiles"
-  local FILE="solution"
-  local MAP="map_solution"
-  local MAP_LN="${HOME}/.${MAP}"
-  local FILE_LN="${HOME}/.${FILE}"
-
-  if [[ ! -f "${DIR}/${FILE}" ]]; then
-    touch "${DIR}/${FILE}"
-  fi
-  if [[ ! -f "${DIR}/${MAP}" ]]; then
-    touch "${DIR}/${MAP}"
-  fi
-
-  # Create symlinks (force)
-  ln -sf "${DIR}/${FILE}" "${FILE_LN}"
-  ln -sf "${DIR}/${MAP}" "${MAP_LN}"
-
-  if (("$1")); then
-    local number=$(get_solution_line_num "$1")
-    local result=$(sed -n "${number}p" "$FILE_LN")
-    ! ((${#result})) && echo "No matched solutions!" || echo "$result"
-  elif [[ "$1" == "-a" ]]; then
-    # Add item
-    read -ep "Enter your solution: " result
-    echo "Added solution: \"$result\""
-    printf "%s\n" "$result" >> "$FILE_LN"
-    local lines_num=$(cat "$FILE_LN" | wc -l)
-    printf "%s\n" "${2};${lines_num}" >> "$MAP_LN"
-  elif [[ "$1" == "-r" ]]; then
-    # Remove solution
-    local number=$(get_solution_line_num "$2")
-    if (("$number")); then
-      echo "Removed solution: \"$(sed -n ${number}p "$FILE_LN")\""
-      sed -i --follow-symlinks ${number}d "$FILE_LN"
-      sed -i --follow-symlinks "/${2};/d" "$MAP_LN"
-    fi
-  else
-    # List items wih numbers
-    nl -b a "$FILE_LN" | less
-  fi 
 }
 
 # Simple TODO
 todo()
 {
-  local DIR="${HOME}/Projects/dotfiles"
-  local FILE="todo"
-  local FILE_LN="${HOME}/.${FILE}"
-        
-  if [[ ! -f "${DIR}/${FILE}" ]]; then
-    touch "${DIR}/${FILE}"
+  local DOTFILES="${HOME}/Projects/dotfiles"
+
+  local TODO="todo"
+  local TODO_LN="${HOME}/.${TODO}"
+
+  local SOLUTION="solution"
+  local SOLUTION_LN="${HOME}/.${SOLUTION}"
+
+  if [[ ! -f "${DOTFILES}/${TODO}" ]]; then
+    touch "${DOTFILES}/${TODO}"
+  fi
+
+  if [[ ! -f "${DOTFILES}/${SOLUTION}" ]]; then
+    touch "${DOTFILES}/${SOLUTION}"
   fi
 
   # Create symlinks (force)
-  ln -sf "${DIR}/${FILE}" "${FILE_LN}"
+  ln -sf "${DOTFILES}/${TODO}" "${TODO_LN}"
+  ln -sf "${DOTFILES}/${SOLUTION}" "${SOLUTION_LN}"
+
+  # Get the last item number
+  get_max_item_num()
+  {
+    echo $(awk -F '$' -v max=0 '{if($1>max) {max=$1} } END{print max}' $1)
+  }
+
+  # Manage solutions for todos
+  solution()
+  {
+    if (("$1")); then
+      # Show solution
+      local result=$(sed -n "/${1}\\$/ s/${1}\\$//p" "$SOLUTION_LN")
+      ! ((${#result})) && echo "No matched solutions!" || echo "$result"
+    elif [[ "$1" == "-a" ]]; then
+      # Add solution
+      read -ep "Enter your solution: " result
+      printf "%s\n" "${2}\$${result}" >> "$SOLUTION_LN"
+      echo "Added solution: \"$result\""
+    elif [[ "$1" == "-r" ]]; then
+      # Remove solution
+      sed -i --follow-symlinks "/${2}\\$/d" "$SOLUTION_LN"
+      echo "Removed solution: \"$(sed -n "/${2}\\$/p" "$SOLUTION_LN")\""
+    else
+      # List solutions with numbers
+      sed -nr "s/\\$/: /p" "$SOLUTION_LN" | less
+    fi
+  }
 
   if ! (($#)); then
-    cat "$FILE_LN" | grep '\[ \]' | less
+    # Print todos
+    sed -nr "/\[ \]/ s/[0-9]+\\$\[ \]\\$//p" "$TODO_LN" | less
   elif [[ "$1" == "-l" ]]; then
-    # List items wih numbers
-    nl -b a "$FILE_LN" | grep '\[ \]' | less
+    # List todos with numbers
+    sed -nr "/\[ \]/ s/\\$\[ \]\\$/: /p" "$TODO_LN" | less
   elif [[ "$1" == "-a" ]]; then
-    # List all items wih numbers
-    nl -b a "$FILE_LN" | less
+    # List all todos with numbers
+    sed -nr "s/\\$\[ \]\\$/: /p" "$TODO_LN" | less
   elif [[ "$1" == "-c" ]]; then
-    # Clear the file
-    > "$FILE_LN"
+    # Clear all todos
+    > "$TODO_LN"
   elif [[ "$1" == "-d" ]]; then
-    nl -b a "$FILE_LN" | grep '\[ \]' | less
+    # Do todo
+    sed -nr "/\[ \]/ s/\\$\[ \]\\$/: /p" "$TODO_LN" | less
     read -p "Type a number to do: " number
-    sed -i --follow-symlinks "${number}s/\[ \]/[x]/" "$FILE_LN"
-    read -n 1 -p "Do you want to post solution (Y/n)? " answer; echo
-    [[ $answer = [Yy] ]] && solution -a "$number"
+    sed -i --follow-symlinks "/${number}\\$/ s/\[ \]/[x]/" "$TODO_LN"
+    echo "Done item: \"$(sed -n "/${number}\\$/ s/${number}\\$\[x\]\\$//p" "$TODO_LN")\""
+    read -n 1 -p "Post solution (Y/n)? " answer; echo
+    [[ ${answer:-y} = [Yy] ]] && solution -a "$number"
   elif [[ "$1" == "-p" ]]; then
-    nl -b a "$FILE_LN" | less
+    # Post solution
+    sed -nr "/\[ \]/ s/\\$\[ \]\\$/: /p" "$TODO_LN" | less
     read -p "Type a number to post solution for: " number
     solution -a "$number"
   elif [[ "$1" == "-s" ]]; then
+    # Show solutions
     (("$2")) && solution "$2" || solution
   elif [[ "$1" == "-u" ]]; then
-    nl -b a "$FILE_LN" | grep '\[x\]' | less
+    # Undo todo
+    sed -nr "/\[x\]/ s/\\$\[ \]\\$/: /p" "$TODO_LN" | less
     read -p "Type a number to undo: " number
-    echo "Undone item: \"$(sed -n "${number}s/\[x\] //p" "$FILE_LN")\""
-    sed -i --follow-symlinks "${number}s/\[x\]/[ ]/" "$FILE_LN"
+    sed -i --follow-symlinks "/${number}\\$/ s/\[x\]/[ ]/" "$TODO_LN"
+    echo "Undone item: \"$(sed -n "/${number}\\$/ s/${number}\\$\[x\]\\$//p" "$TODO_LN")\""
     solution -r "$number"
   elif [[ "$1" == "-r" ]]; then
-    nl -b a "$FILE_LN" | less
+    # Remove todo
+    sed -nr "/\[ \]/ s/\\$\[ \]\\$/: /p" "$TODO_LN" | less
     read -p "Type a number to remove: " number
-    echo "Removed item: \"$(sed -rn "${number}s/\[[x ]\] //p" "$FILE_LN")\""
-    sed -i --follow-symlinks ${number}d "$FILE_LN"
+    sed -i --follow-symlinks "/${number}\\$/d" "$TODO_LN"
+    echo "Removed item: \"$(sed -rn "/${number}\\$/ s/${number}\\$\[[x ]\]\\$//p" "$TODO_LN")\""
     solution -r "$number"
   else
-    # Add item
+    # Add todo
+    local max_item_num=$(get_max_item_num)
+    printf "%s\n" "${max_item_num}\$[ ]\$${*}" >> "$TODO_LN"
     echo "Added item: \"${*}\""
-    printf "%s\n" "[ ] ${*}" >> "$FILE_LN"
   fi
+
+  unset get_max_item_num
+  unset solution
 }
 
 # Decompress any compressed file format
-extract() 
+extract()
 {
  if [ -z "$1" ]; then
     # display usage if no parameters given
@@ -170,7 +166,7 @@ extract()
     do
       if [ -f "$n" ] ; then
           case "${n%,}" in
-            *.tar.bz2|*.tar.gz|*.tar.xz|*.tbz2|*.tgz|*.txz|*.tar) 
+            *.tar.bz2|*.tar.gz|*.tar.xz|*.tbz2|*.tgz|*.txz|*.tar)
                          tar xvf "$n"       ;;
             *.lzma)      unlzma ./"$n"      ;;
             *.bz2)       bunzip2 ./"$n"     ;;
@@ -195,7 +191,7 @@ fi
 }
 
 # Compile and execute a C source on the fly
-csource() 
+csource()
 {
   [[ $1 ]]    || { echo "Missing operand" >&2; return 1; }
   [[ -r $1 ]] || { printf "File %s does not exist or is not readable\n" "$1" >&2; return 1; }
@@ -206,7 +202,7 @@ csource()
 }
 
 # Calculator
-calc() 
+calc()
 {
     echo "scale=3;$@" | bc -l
 }
@@ -215,7 +211,7 @@ calc()
 ff() { find . -name $@ -print; }
 
 # Kill process by name
-kp() 
+kp()
 {
   ps aux | grep $1 > /dev/null
   mypid=$(pidof $1)
@@ -235,10 +231,10 @@ kp()
 #
 # INPUT:
 # Provide any number of word-parameters to the script
-# 
+#
 # OUTPUT:
 # The result would be multiple strings corresponding found records
-keys() 
+keys()
 {
   local FILE="$HOME"/keys.xml
 
@@ -249,7 +245,7 @@ keys()
   xpath_base="${xpath_base}/keys"
 
   # Get full command for extracting particular part, whether attribute or node
-  # 
+  #
   # INPUT:
   # $1 = 'attr' / 'node'
   # $2 = file
@@ -257,7 +253,7 @@ keys()
   # OUTPUT:
   # string
   extract_xpath() {
-    case $1 in 
+    case $1 in
       'attr')
         local grep_case='".*"'
         local fs_case='"'
@@ -271,7 +267,7 @@ keys()
         ;;
     esac
 
-    echo cat "$xpath_base" | xmllint --shell "$2" | sed '/-\+/d' | egrep -o "$grep_case" | tr -d "$fs_case" 
+    echo cat "$xpath_base" | xmllint --shell "$2" | sed '/-\+/d' | egrep -o "$grep_case" | tr -d "$fs_case"
   }
 
   mapfile -t local attributes < <(extract_xpath attr "$FILE")
@@ -283,7 +279,7 @@ keys()
 }
 
 # Colored man
-man() 
+man()
 {
   LESS_TERMCAP_md=$'\e[01;31m' \
   LESS_TERMCAP_me=$'\e[0m' \
