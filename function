@@ -75,7 +75,7 @@ todo()
 
   if ! (($#)); then
     # Print todos
-    awk -F '$' '{print $3}' "$TODO_LN" | less
+    awk -F '$' '/\[ \]/ {print $3}' "$TODO_LN" | less
   elif [[ "$1" == "-l" ]]; then
     # List todos with numbers
     sed -nr "/\[ \]/ s/\[ \]\\$//p" "$TODO_LN" | column -ts '$' | less
