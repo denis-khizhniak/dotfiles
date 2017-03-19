@@ -177,7 +177,7 @@ csource()
 # Calculator
 calc()
 {
-    echo "scale=3;$@" | bc -l
+  echo "scale=3;$@" | bc -l
 }
 
 # Find by name
@@ -243,12 +243,15 @@ keys()
     echo cat "$xpath_base" | xmllint --shell "$2" | sed '/-\+/d' | egrep -o "$grep_case" | tr -d "$fs_case"
   }
 
-  mapfile -t local attributes < <(extract_xpath attr "$FILE")
-  mapfile -t local values < <(extract_xpath node "$FILE")
+  mapfile -t attributes < <(extract_xpath attr "$FILE")
+  mapfile -t values < <(extract_xpath node "$FILE")
 
   for (( c=0; c<${#attributes[@]}; c++ )); do
-    echo "${attributes[$c]}: ${values[$c]}"
-  done
+    echo "${values[$c]}: ${attributes[$c]}"
+  done | column -t -s ':'
+
+  unset attributes
+  unset values
 }
 
 # Colored man
