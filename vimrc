@@ -15,6 +15,14 @@ syntax on                       " enable syntax highlighting
 let mapleader = ","
 " let g:mapleader = ","
 
+" fix meta-keys which generate <Esc>a .. <Esc>z
+let chr = 'a'
+while chr <= 'z'
+  exec "set <M-".chr.">=\e".chr
+  exec "imap \e".chr." <M-".chr.">"
+  let chr = nr2char(1+char2nr(chr))
+endw
+
 " Fast saving
 nmap <leader>w :w!<cr>
 
@@ -78,12 +86,12 @@ catch
 endtry
 
 " Move a line of text using ALT+[jk]
-nnoremap <A-j> :m .+1<CR>==
-nnoremap <A-k> :m .-2<CR>==
-inoremap <A-j> <Esc>:m .+1<CR>==gi
-inoremap <A-k> <Esc>:m .-2<CR>==gi
-vnoremap <A-j> :m '>+1<CR>gv=gv
-vnoremap <A-k> :m '<-2<CR>gv=gv
+nnoremap <M-j> :m .+1<CR>==
+nnoremap <M-k> :m .-2<CR>==
+inoremap <M-j> <Esc>:m .+1<CR>==gi
+inoremap <M-k> <Esc>:m .-2<CR>==gi
+vnoremap <M-j> :m '>+1<CR>gv=gv
+vnoremap <M-k> :m '<-2<CR>gv=gv
 
 " Delete trailing white space on save, useful for Python and CoffeeScript ;)
 func! DeleteTrailingWS()
