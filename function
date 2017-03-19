@@ -22,33 +22,6 @@ cl()
   fi
 }
 
-# Run RDP with configuration file specified
-#
-# argument is the file - required
-rdp()
-{
-  local DEFAULT_FILE=".rdp_WSM8-0089"
-  local FILE="${1:-${DEFAULT_FILE}}"
-
-  cat "$FILE" | xargs -rd $'\n' xfreerdp
-}
-
-# Run VPN connection with configuration file specified
-#
-# Arguments:
-#   file - optional
-#   server - required
-vpn()
-{
-  local DEFAULT_SERVER="ras01.netcracker.com"
-
-  for i in "$@"; do
-    [ -f $i ] && local FILE="$i" || local SERVER="$i"
-  done
-
-  sudo openconnect --config=${FILE} ${SERVER:=${DEFAULT_SERVER}}
-}
-
 # Simple TODO
 todo()
 {
