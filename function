@@ -87,7 +87,7 @@ todo()
     > "$TODO_LN"
   elif [[ "$1" == "-d" ]]; then
     # Do todo
-    sed -nr "/\[ \]/ s/\[ \]\\$//p" "$TODO_LN" | column -ts '$' | less
+    todo -l
     read -p "Type a number to do: " number
     echo "Done item: \"$(awk -F '$' -v number=$number '{if($1==number) print $3}' "$TODO_LN")\""
     sed -i --follow-symlinks "/${number}\\$/ s/\[ \]/[x]/" "$TODO_LN"
@@ -95,7 +95,7 @@ todo()
     [[ ${answer:-y} = [Yy] ]] && solution -a "$number"
   elif [[ "$1" == "-p" ]]; then
     # Post solution
-    sed -nr "/\[ \]/ s/\[ \]\\$//p" "$TODO_LN" | column -ts '$' | less
+    todo -l
     read -p "Type a number to post solution for: " number
     solution -a "$number"
   elif [[ "$1" == "-s" ]]; then
@@ -110,7 +110,7 @@ todo()
     solution -r "$number"
   elif [[ "$1" == "-r" ]]; then
     # Remove todo
-    sed -nr "/\[ \]/ s/\[ \]\\$//p" "$TODO_LN" | column -ts '$' | less
+    todo -a
     read -p "Type a number to remove: " number
     echo "Removed item: \"$(awk -F '$' -v number=$number '{if($1==number) print $3}' "$TODO_LN")\""
     sed -i --follow-symlinks "/${number}\\$/d" "$TODO_LN"
@@ -122,8 +122,7 @@ todo()
     printf "%s\n" "${max_item_num}\$[ ]\$${*}" >> "$TODO_LN"
   fi
 
-  unset get_max_item_num
-  unset solution
+  unset get_max_item_num solution
 }
 
 # Decompress any compressed file format
@@ -250,8 +249,7 @@ keys()
     echo "${values[$c]}: ${attributes[$c]}"
   done | column -t -s ':'
 
-  unset attributes
-  unset values
+  unset attributes values
 }
 
 # Colored man
