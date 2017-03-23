@@ -263,3 +263,13 @@ man()
   LESS_TERMCAP_us=$'\e[01;32m' \
   command man "$@"
 }
+
+# Start new ranger instance only if it is not running in current shell 
+rg() {
+    if [ -z "$RANGER_LEVEL" ]
+    then
+        ranger
+    else
+        exit
+    fi
+}
