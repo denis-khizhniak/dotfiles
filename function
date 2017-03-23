@@ -90,7 +90,7 @@ todo()
     todo -l
     read -p "Type a number to do: " number
     echo "Done item: \"$(awk -F '$' -v number=$number '{if($1==number) print $3}' "$TODO_LN")\""
-    sed -i --follow-symlinks "/${number}\\$/ s/\[ \]/[x]/" "$TODO_LN"
+    sed -i --follow-symlinks "/^${number}\\$/ s/\[ \]/[x]/" "$TODO_LN"
     read -n 1 -p "Post solution (Y/n)? " answer; echo
     [[ ${answer:-y} = [Yy] ]] && solution -a "$number"
   elif [[ "$1" == "-p" ]]; then
@@ -106,14 +106,14 @@ todo()
     sed -nr "/\[x\]/ s/\[x\]\\$//p" "$TODO_LN" | column -ts '$' | less
     read -p "Type a number to undo: " number
     echo "Undone item: \"$(awk -F '$' -v number=$number '{if($1==number) print $3}' "$TODO_LN")\""
-    sed -i --follow-symlinks "/${number}\\$/ s/\[x\]/[ ]/" "$TODO_LN"
+    sed -i --follow-symlinks "/^${number}\\$/ s/\[x\]/[ ]/" "$TODO_LN"
     solution -r "$number"
   elif [[ "$1" == "-r" ]]; then
     # Remove todo
     todo -a
     read -p "Type a number to remove: " number
     echo "Removed item: \"$(awk -F '$' -v number=$number '{if($1==number) print $3}' "$TODO_LN")\""
-    sed -i --follow-symlinks "/${number}\\$/d" "$TODO_LN"
+    sed -i --follow-symlinks "/^${number}\\$/d" "$TODO_LN"
     solution -r "$number"
   else
     # Add todo
@@ -121,8 +121,6 @@ todo()
     echo "Added item: \"${*}\""
     printf "%s\n" "${max_item_num}\$[ ]\$${*}" >> "$TODO_LN"
   fi
-
-  unset get_max_item_num solution
 }
 
 # Decompress any compressed file format
@@ -273,3 +271,6 @@ rg() {
         exit
     fi
 }
+
+unset get_max_item_num
+unset solution
