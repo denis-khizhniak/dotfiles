@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# ~/.dmenu_run
+# 
+# Change /usr/bin/dmenu_run to run this file and exit
+
+TERM_APPS=~/.dmenu_term_apps
+FILTER_APPS=~/.dmenu_filter_apps
+
+app=$(dmenu_path | grep -f "$FILTER_APPS" | dmenu "$@")
+
+echo "$app" | grep -f "$TERM_APPS" && st -e "$app" || echo "$app" | ${SHELL:-"/bin/sh"} &
