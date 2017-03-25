@@ -48,7 +48,7 @@ todo()
   # Get the last item number
   get_max_item_num()
   {
-    echo $(awk -F '$' -v max=0 '{if($1>max) {max=$1} } END{print max}' $1)
+    echo $(awk -F '$' -v max=0 '{if($1>max) {max=$1} } END{print max}' "$TODO")
   }
 
   # Manage solutions for todos
@@ -119,7 +119,7 @@ todo()
     # Add todo
     local max_item_num=$(get_max_item_num)
     echo "Added item: \"${*}\""
-    printf "%s\n" "${max_item_num}\$[ ]\$${*}" >> "$TODO_LN"
+    printf "%s\n" "$((max_item_num+1))\$[ ]\$${*}" >> "$TODO_LN"
   fi
 }
 
