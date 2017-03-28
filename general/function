@@ -25,25 +25,16 @@ cl()
 # Simple TODO
 todo()
 {
-  local DOTFILES="${HOME}/Projects/dotfiles"
+  local TODO="${HOME}/Projects/scripts/todo"
+  local SOLUTION="${HOME}/Projects/scripts/solution"
 
-  local TODO="todo"
-  local TODO_LN="${HOME}/.${TODO}"
-
-  local SOLUTION="solution"
-  local SOLUTION_LN="${HOME}/.${SOLUTION}"
-
-  if [[ ! -f "${DOTFILES}/${TODO}" ]]; then
-    touch "${DOTFILES}/${TODO}"
+  if [[ ! -f "$TODO" ]]; then
+    touch "$TODO"
   fi
 
-  if [[ ! -f "${DOTFILES}/${SOLUTION}" ]]; then
-    touch "${DOTFILES}/${SOLUTION}"
+  if [[ ! -f "$SOLUTION" ]]; then
+    touch "$SOLUTION"
   fi
-
-  # Create symlinks (force)
-  ln -sf "${DOTFILES}/${TODO}" "${TODO_LN}"
-  ln -sf "${DOTFILES}/${SOLUTION}" "${SOLUTION_LN}"
 
   # Get the last item number
   get_max_item_num()
@@ -56,41 +47,41 @@ todo()
   {
     if (("$1")); then
       # Show solution
-      local result=$(sed -n "/${1}\\$/ s/${1}\\$//p" "$SOLUTION_LN")
+      local result=$(sed -n "/${1}\\$/ s/${1}\\$//p" "$SOLUTION")
       ! ((${#result})) && echo "No matched solutions!" || echo "$result"
     elif [[ "$1" == "-a" ]]; then
       # Add solution
       read -ep "Enter your solution: " result
       echo "Added solution: \"$result\""
-      printf "%s\n" "${2}\$${result}" >> "$SOLUTION_LN"
+      printf "%s\n" "${2}\$${result}" >> "$SOLUTION"
     elif [[ "$1" == "-r" ]]; then
       # Remove solution
-      echo "Removed solution: \"$(sed -n "/${2}\\$/p" "$SOLUTION_LN")\""
-      sed -i --follow-symlinks "/${2}\\$/d" "$SOLUTION_LN"
+      echo "Removed solution: \"$(sed -n "/${2}\\$/p" "$SOLUTION")\""
+      sed -i --follow-symlinks "/${2}\\$/d" "$SOLUTION"
     else
       # List solutions with numbers
-      column -ts '$' "$SOLUTION_LN" | less
+      column -ts '$' "$SOLUTION" | less
     fi
   }
 
   if ! (($#)); then
     # Print todos
-    awk -F '$' '/\[ \]/ {print $3}' "$TODO_LN" | less
+    awk -F '$' '/\[ \]/ {print $3}' "$TODO" | less
   elif [[ "$1" == "-l" ]]; then
     # List todos with numbers
-    sed -nr "/\[ \]/ s/\[ \]\\$//p" "$TODO_LN" | column -ts '$' | less
+    sed -nr "/\[ \]/ s/\[ \]\\$//p" "$TODO" | column -ts '$' | less
   elif [[ "$1" == "-a" ]]; then
     # List all todos with numbers
-    column -ts '$' "$TODO_LN" | less
+    column -ts '$' "$TODO" | less
   elif [[ "$1" == "-c" ]]; then
     # Clear all todos
-    > "$TODO_LN"
+    > "$TODO"
   elif [[ "$1" == "-d" ]]; then
     # Do todo
     todo -l
     read -p "Type a number to do: " number
-    echo "Done item: \"$(awk -F '$' -v number=$number '{if($1==number) print $3}' "$TODO_LN")\""
-    sed -i --follow-symlinks "/^${number}\\$/ s/\[ \]/[x]/" "$TODO_LN"
+    echo "Done item: \"$(awk -F '$' -v number=$number '{if($1==number) print $3}' "$TODO")\""
+    sed -i --follow-symlinks "/^${number}\\$/ s/\[ \]/[x]/" "$TODO"
     read -n 1 -p "Post solution (Y/n)? " answer; echo
     [[ ${answer:-y} = [Yy] ]] && solution -a "$number"
   elif [[ "$1" == "-p" ]]; then
@@ -103,23 +94,23 @@ todo()
     (("$2")) && solution "$2" || solution
   elif [[ "$1" == "-u" ]]; then
     # Undo todo
-    sed -nr "/\[x\]/ s/\[x\]\\$//p" "$TODO_LN" | column -ts '$' | less
+    sed -nr "/\[x\]/ s/\[x\]\\$//p" "$TODO" | column -ts '$' | less
     read -p "Type a number to undo: " number
-    echo "Undone item: \"$(awk -F '$' -v number=$number '{if($1==number) print $3}' "$TODO_LN")\""
-    sed -i --follow-symlinks "/^${number}\\$/ s/\[x\]/[ ]/" "$TODO_LN"
+    echo "Undone item: \"$(awk -F '$' -v number=$number '{if($1==number) print $3}' "$TODO")\""
+    sed -i --follow-symlinks "/^${number}\\$/ s/\[x\]/[ ]/" "$TODO"
     solution -r "$number"
   elif [[ "$1" == "-r" ]]; then
     # Remove todo
     todo -a
     read -p "Type a number to remove: " number
-    echo "Removed item: \"$(awk -F '$' -v number=$number '{if($1==number) print $3}' "$TODO_LN")\""
-    sed -i --follow-symlinks "/^${number}\\$/d" "$TODO_LN"
+    echo "Removed item: \"$(awk -F '$' -v number=$number '{if($1==number) print $3}' "$TODO")\""
+    sed -i --follow-symlinks "/^${number}\\$/d" "$TODO"
     solution -r "$number"
   else
     # Add todo
     local max_item_num=$(get_max_item_num)
     echo "Added item: \"${*}\""
-    printf "%s\n" "$((max_item_num+1))\$[ ]\$${*}" >> "$TODO_LN"
+    printf "%s\n" "$((max_item_num+1))\$[ ]\$${*}" >> "$TODO"
   fi
 }
 
@@ -206,7 +197,7 @@ kp()
 # The result would be multiple strings corresponding found records
 keys()
 {
-  local FILE="$HOME"/keys.xml
+  local FILE=~/Projects/scripts/keys.xml
 
   local xpath_base=""
   for i in "$@"; do

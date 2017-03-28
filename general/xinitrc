@@ -40,12 +40,22 @@ numlockx &
 
 # Statusbar loop
 while true; do
-  ~/.dwm-status
+  ~/Projects/dotfiles/dwm-status
   sleep 1s    # Update every second
 done &
 
-# udevadm monitor for automouting block devices
-~/.udevadm_monitor &
+# Monitor and mount block devices
+~/Projects/scripts/monitor_block_devices &
+
+# Monitor and mount android devices
+~/Projects/scripts/monitor_android_devices &
+
+# Keyring
+eval $(/usr/bin/gnome-keyring-daemon --start --components=pkcs11,secrets,ssh) &
+export SSH_AUTH_SOCK
+
+# Set wallpaper
+feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/Orange-Water-1366x768.jpg &
 
 # Run dwm
-exec ~/.startdwm
+exec ~/Projects/dotfiles/dwm/startdwm

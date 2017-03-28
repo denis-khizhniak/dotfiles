@@ -1,0 +1,123 @@
+# Set layout
+loadkeys ru
+
+# Set console font
+setfont UniCyrExt_8x16
+
+# Bring the interface up (optional)
+ip link set wlp3s0 up
+
+# check that interface is up (optional)
+ip link show wlp3s0
+
+# check regdomain
+iw reg get
+
+# set RU regdomain if necessary
+iw reg set RU
+
+# Associate wireless device with the access point to use and pass the encryption key
+wpa_supplicant [-D nl80211,wext] -i wlp3s0 -c <(wpa_passphrase DOnet <pass>) -B
+
+# get IP address
+dhcpcd wlp3s0
+
+# Disable the interface
+ip link set [dev] wlp3s0 down
+
+# Enable network time synchronization
+timedatectl set-ntp true
+
+# Set local timezone
+timedatectl set-timezone Europe/Moscow
+
+# Create MBR partition
+# Create single primary partition using all available space
+# Flag the partition that it containt \boot partition
+# Drop flag for Win
+parted /dev/sda
+(parted)> mklable msdos
+(parted)> mkpart primary ext4 1MiB 100%
+(parted)> set 1 boot on
+(parted)> set 1 lba off
+
+# Format partition
+mkfs.ext4 /dev/sda1
+
+# Mount file system on the root partition
+mount /dev/sda1 /mnt
+
+# Change mirrors list at /etc/pacman.d/mirrorlist
+
+# Install base packages
+pacstrap /mnt base
+
+# Generate fstab file
+genfstab -U /mnt >> /mnt/etc/fstab
+
+# chroot into the new system
+arch-chroot /mnt
+
+# Install wpa_supplicant, wpa_passphrase, crda
+
+# Set the time zone
+ln -sf /usr/share/zoneinfo/Europe/Moscow /etc/localtime
+
+# Set hardware clock from the current system time
+hwclock --systohc
+
+# Uncomment en_US... and ru_RU... localizations
+
+# Generate selected locales
+locale-gen
+
+# Set the LANG variable
+echo "LANG=en_US.UTF-8" > /etc/locale.conf
+
+# Make the changes persistent for keyboard layout and console font
+echo "KEYMAP=ruwin_alt_ch-UTF-8" > /etc/vconsole.conf
+echo "FONT=Cyr_a8x16" >> /etc/vconsole.conf
+
+# Create the hostname
+echo "<hostname>" > /etc/hostname
+
+# Add corresponding entry to /etc/hosts
+127.0.1.1   <hostname>.localdomain   <hostname>
+
+# Set root password
+passwd
+
+# Install GRUB
+pacman -S grub
+
+# Set up GRUB
+grub-install --target=i386-pc /dev/sda
+
+# Install package for microcode updates
+pacman -S intel-ucode
+
+# Generate GRUB config file
+grub-mkconfig -o /boot/grub/grub.cfg
+
+# Exit the chroot environment
+exit
+# Unmount all partitions
+umount -R /mnt
+
+# Reboot
+reboot
+
+# Install sudo
+
+# Add user <user>
+useradd -m -G wheel <user>
+
+# Set password for user <user>
+passwd <user>
+
+# Install xorg-server, xf86-video-ati, xorg-xinit, base-devel, alsa-utils, xorg-setroot, dunst, numix-gtk-theme, mesa, libvdpau-va-gl, mesa-vdpau, libva-vdpau-driver, libva-mesa-driver, libva, vdpauinfo
+# Install gnome-themes-standard to eliminate the error 'Gtk-WARNING **: Unable to locate theme engine in module_path: “adwaita"'
+# Install schedtool to get and set CPU scheduling parameters (can be used at program launch)
+# Install irqbalance to distribute hardware interrupts by service
+# Install vlc and qt4, remmina, networkmanager, deluge with python2-gobject2 and pygtk, freerdp
+# Install mdp with gmpc or ncmpcpp

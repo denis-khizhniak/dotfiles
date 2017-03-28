@@ -6,8 +6,8 @@
 [[ $- != *i* ]] && return
 
 # Source alias and functions 
-. ~/.alias
-. ~/.function
+. ~/Projects/dotfiles/general/alias
+. ~/Projects/dotfiles/general/function
 
 PS1='[\u@\h \W]\$ '
 
