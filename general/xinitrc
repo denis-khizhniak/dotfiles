@@ -40,7 +40,7 @@ numlockx &
 
 # Statusbar loop
 while true; do
-  ~/Projects/dotfiles/dwm-status
+  ~/Projects/dotfiles/dwm/dwm-status
   sleep 1s    # Update every second
 done &
 
