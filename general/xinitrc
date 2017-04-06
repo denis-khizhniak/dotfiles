@@ -44,6 +44,21 @@ while true; do
   sleep 1s    # Update every second
 done &
 
+# Check threshold system parameter values
+while true; do
+  # Battery
+  BAT=$(acpi -b | awk -F '[,:] ' '{print $3}')
+
+  if (( ${BAT%%%*} <= 15 )); then
+    ((! ${is_bat_notif_raised:-0})) && notify-send "Low Battery!" "Please plugin charger!"
+    is_bat_notif_raised=1
+  else
+    is_bat_notif_raised=0
+  fi
+
+  sleep 1s    # Check every second
+done &
+
 # Monitor and mount block devices
 ~/Projects/scripts/monitor_block_devices &
 
@@ -56,6 +71,9 @@ export SSH_AUTH_SOCK
 
 # Set wallpaper
 feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/Orange-Water-1366x768.jpg &
+
+# Run network-manager applet
+nm-applet &
 
 # Run dwm
 exec ~/Projects/dotfiles/dwm/startdwm
