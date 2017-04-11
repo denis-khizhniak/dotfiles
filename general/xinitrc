@@ -72,8 +72,9 @@ export SSH_AUTH_SOCK
 # Set wallpaper
 feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/Orange-Water-1366x768.jpg &
 
-# Run network-manager applet
+# Run applets
 nm-applet &
+volumeicon &
 
 # Run dwm
 exec ~/Projects/dotfiles/dwm/startdwm
