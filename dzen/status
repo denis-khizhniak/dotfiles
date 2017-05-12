@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# ~/.dwm-status
+#
+
+TEMP=$(($(cat /sys/class/thermal/thermal_zone0/temp)/1000))
+TIME="$(date '+%a, %-d %b %Y %Z %R')"
+USED_RAM=$(free -m | grep '^Mem' | tr -s ' ' | cut -d ' ' -f3)
+USED_RAM_H=$(free -h | grep '^Mem' | tr -s ' ' | cut -d ' ' -f3)
+TOTAL_RAM=$(free -m | grep '^Mem' | tr -s ' ' | cut -d ' ' -f2)
+USED_RAM_PCT=$(perl -e "printf(\"%.f\", $USED_RAM / $TOTAL_RAM * 100)")	# % of Used Memory 
+UPTIME=$(uptime | sed 's/.*: //; s/,//g')
+VOL=$(amixer get Master | tail -1 | sed 's/.*\[\([0-9]*%\)\].*/\1/')
+BAT=$(acpi -b | awk -F '[,:] ' '{if ($2=="Charging") print $3" (+)"; else if ($2=="Discharging") print $3" (-)"; else print $3}')
+
+echo "[CPU:$UPTIME] [RAM:${USED_RAM_H}] [${USED_RAM_PCT}%] [Temp:${TEMP}C] [Vol:$VOL] [Bat:$BAT] $TIME"

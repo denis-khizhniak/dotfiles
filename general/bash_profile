@@ -6,6 +6,7 @@
 
 # Set default editor
 export EDITOR=vim
+export PATH=/home/den/Projects/dotfiles/dmenu:${PATH}
 
 # Autostart X at login
 if [ -z "$DISPLAY" ] && [ -n "$XDG_VTNR" ] && [ "$XDG_VTNR" -eq 1 ]; then
