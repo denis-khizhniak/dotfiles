@@ -19,45 +19,77 @@ alias lsl='ls -lah | less'
 
 # Package management
 alias lsorphans='sudo pacman -Qdt'
-alias rmorphans='sudo pacman -Rs $(pacman -Qtdq)'
+alias rmorphans='[[ $(pacman -Qtdq) ]] && sudo pacman -Rs $(pacman -Qtdq)'
 alias pacman='sudo pacman'
-alias pi='sudo pacman -S --needed'
+alias pi='pacaur -S --needed'
 alias pkgfiles='sudo pacman -Qlq "$1" | grep -v / | xargs du -h | sort -h'
 alias pr='sudo pacman -Rs'
-alias pu='sudo pacman -Syu'
+alias prd='sudo pacman -Rsc'
+alias pu='pacaur -Syu'
+alias pc='pacaur -Sc' # clear cached packages
 
 # File management
-alias fhere='find . -name '
+alias fhere='find . -name ' # find by name in current dir
 alias mkdir='mkdir -pv'
+alias ftoday='ls -al --time-style=+%D | grep `date +%D`' # find changed today files
 
 # Process management
 alias ps='ps auxf'
-alias psg='ps aux | grep -v grep | grep -i -e VSZ -e'
+alias psg='ps aux | grep -v grep | grep -i -e VSZ -e' # find process by name
+alias cputop10='ps aux --sort=-%cpu | grep -m 11 -v `whoami`' # Top 10 processes utilizing CPU
 
 # System management
 alias reboot='sudo reboot'
 alias mount='mount | column -t'
 alias log='journalctl -x'
 alias logerr='journalctl -xp err..alert'
+alias regrub='grub-mkconfig -o /boot/grub/grub.cfg'
+alias sstat='systemctl status'
+alias shelp='systemctl help'
+alias sfailed='systemctl --failed'
+alias sreload='systemctl daemon-reload'
+alias sfiles='systemctl list-unit-files'
+alias senabled='systemctl list-unit-files --state=enabled'
+alias sdisabled='systemctl list-unit-files --state=disabled'
+alias realsa='alsactl restore'
+
+# System information
+alias bootinfo='cat /proc/cmdline' # boot parameters
+alias meminfo='cat /proc/meminfo'
+alias cpuinfo='cat /proc/cpu'
+alias oports='netstat -lnp' # opened ports
 
 # Rebuild package shortcut
 alias redwm='cd ~/Projects/dwm; updpkgsums; makepkg -fi --noconfirm && killall dwm'
+alias repack='updpkgsums && makepkg -fi --noconfirm'
 
 # Handy shortcuts
 alias x='exit'
-alias ..='cd ..'
+alias v='vim'
 alias c='clear'
 alias h='history'
 alias j='jobs -l'
+alias cal='cal -m3'
+alias rm='rm -vI'
+alias sctl='systemctl'
+alias sctlu='systemctl --user'
+alias mpvgo='mpv --audio-device=alsa/sysdefault:CARD=Go'
+alias cal='cal -wm'
+
+# Navidation
+alias ..='cd ..'
+alias cdm='cd /media'
 
 # Git
 alias gs='git status'
 alias ga='git add'
 alias gb='git branch '
-alias gc='git commit'
+alias gcm='git commit'
+alias gcma='git commit -am'
 alias gd='git diff'
 alias go='git checkout'
-alias cal='cal -wm'
+alias gc='git clone'
+alias gp='git push'
 
 # Keymap
 alias xev='xev | awk -F'\''[ )]+'\'' '\''/^KeyPress/ { a[NR+2] } NR in a { printf "%-3s %s\n", $5, $8 }'\'''
@@ -66,3 +98,7 @@ alias xev='xev | awk -F'\''[ )]+'\'' '\''/^KeyPress/ { a[NR+2] } NR in a { print
 alias xprop='xprop | awk '\''
     /^WM_CLASS/{sub(/.* =/, "instance:"); sub(/,/, "\nclass:"); print}
     /^WM_NAME/{sub(/.* =/, "title:"); print}'\'''
+
+# Hardware
+alias testmic='arecord -vv -f dat /dev/null'  # test microphone
+alias recplay='arecord --duration=5 --format=dat /tmp/test-mic.wav && aplay /tmp/test-mic.wav'

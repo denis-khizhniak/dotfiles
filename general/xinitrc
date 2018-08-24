@@ -38,43 +38,47 @@ fi
 # Activate NumLock
 numlockx &
 
-# Statusbar loop
-while true; do
-  ~/Projects/dotfiles/dwm/dwm-status
-  sleep 1s    # Update every second
-done &
-
-# Check threshold system parameter values
-while true; do
-  # Battery
-  BAT=$(acpi -b | awk -F '[,:] ' '{print $3}')
-
-  if (( ${BAT%%%*} <= 15 )); then
-    ((! ${is_bat_notif_raised:-0})) && notify-send "Low Battery!" "Please plugin charger!"
-    is_bat_notif_raised=1
-  else
-    is_bat_notif_raised=0
-  fi
-
-  sleep 1s    # Check every second
-done &
+# Check threshold system parameter values loop
+monitor_low_battery &
 
 # Monitor and mount block devices
-~/Projects/scripts/monitor_block_devices &
+monitor_block_devices &
 
 # Monitor and mount android devices
-~/Projects/scripts/monitor_android_devices &
+#monitor_android_devices &
 
-# Keyring
+# Start the gnome-keyring-daemon
 eval $(/usr/bin/gnome-keyring-daemon --start --components=pkcs11,secrets,ssh) &
 export SSH_AUTH_SOCK
 
 # Set wallpaper
-feh --no-fehbg --bg-scale ~/Pictures/Wallpapers/Orange-Water-1366x768.jpg &
+~/.fehbg &
+
+# Statusbar loop
+# while true; do
+#     dwm-status
+#     sleep 1s
+# done &
+
+# Run slstatus as alternative to bash dwm-status
+slstatus &
+
+# Screensaver manager
+xss-lock -- i3lock -n -i ~/.lock_screen &
 
 # Run applets
 nm-applet &
 volumeicon &
+#xinput --set-prop 12 --type=float 'libinput Accel Speed' 0.50  # Set A4TECH USB mouse acceleration
+xinput --set-prop 11 --type=float 'libinput Accel Speed' -0.85  # Set MOSART Semi. 2.4G Wireless Mouse
+
+# Solve a rendering issue of Java GUIs
+wmname LG3D &
+
+# Start compositor
+compton --config ~/.compton.conf -b
 
 # Run dwm
-exec ~/Projects/dotfiles/dwm/startdwm
+exec startdwm
+#exec bspwm -c ~/.bspwmrc
+

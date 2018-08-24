@@ -4,11 +4,9 @@
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
 
-# Set default editor
 export EDITOR=vim
-export PATH=/home/den/Projects/dotfiles/dmenu:${PATH}
+export XDG_CONFIG_HOME=~/.config
+export PATH="/home/den/bin":${PATH}
 
 # Autostart X at login
-if [ -z "$DISPLAY" ] && [ -n "$XDG_VTNR" ] && [ "$XDG_VTNR" -eq 1 ]; then
-	exec startx
-fi
+[ -z "$DISPLAY" ] && [ -n "$XDG_VTNR" ] && [ "$XDG_VTNR" -eq 1 ] && exec startx

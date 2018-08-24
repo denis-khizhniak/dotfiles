@@ -1,6 +1,5 @@
 #!/bin/bash
 #
-# ~/.function
 #
 
 # Create a directory and immediately move into it
@@ -19,98 +18,6 @@ cl()
     cd "$dir" >/dev/null; ls -lh
   else
     echo "bash: cl: $dir: Directory not found"
-  fi
-}
-
-# Simple TODO
-todo()
-{
-  local TODO="${HOME}/Projects/scripts/todo"
-  local SOLUTION="${HOME}/Projects/scripts/solution"
-
-  if [[ ! -f "$TODO" ]]; then
-    touch "$TODO"
-  fi
-
-  if [[ ! -f "$SOLUTION" ]]; then
-    touch "$SOLUTION"
-  fi
-
-  # Get the last item number
-  get_max_item_num()
-  {
-    echo $(awk -F '$' -v max=0 '{if($1>max) {max=$1} } END{print max}' "$TODO")
-  }
-
-  # Manage solutions for todos
-  solution()
-  {
-    if (("$1")); then
-      # Show solution
-      local result=$(sed -n "/${1}\\$/ s/${1}\\$//p" "$SOLUTION")
-      ! ((${#result})) && echo "No matched solutions!" || echo "$result"
-    elif [[ "$1" == "-a" ]]; then
-      # Add solution
-      read -ep "Enter your solution: " result
-      echo "Added solution: \"$result\""
-      printf "%s\n" "${2}\$${result}" >> "$SOLUTION"
-    elif [[ "$1" == "-r" ]]; then
-      # Remove solution
-      echo "Removed solution: \"$(sed -n "/${2}\\$/p" "$SOLUTION")\""
-      sed -i --follow-symlinks "/${2}\\$/d" "$SOLUTION"
-    else
-      # List solutions with numbers
-      column -ts '$' "$SOLUTION" | less
-    fi
-  }
-
-  if ! (($#)); then
-    # Print todos
-    awk -F '$' '/\[ \]/ {print $3}' "$TODO" | less
-  elif [[ "$1" == "-l" ]]; then
-    # List todos with numbers
-    sed -nr "/\[ \]/ s/\[ \]\\$//p" "$TODO" | column -ts '$' | less
-  elif [[ "$1" == "-a" ]]; then
-    # List all todos with numbers
-    column -ts '$' "$TODO" | less
-  elif [[ "$1" == "-c" ]]; then
-    # Clear all todos
-    > "$TODO"
-  elif [[ "$1" == "-d" ]]; then
-    # Do todo
-    todo -l
-    read -p "Type a number to do: " number
-    echo "Done item: \"$(awk -F '$' -v number=$number '{if($1==number) print $3}' "$TODO")\""
-    sed -i --follow-symlinks "/^${number}\\$/ s/\[ \]/[x]/" "$TODO"
-    read -n 1 -p "Post solution (Y/n)? " answer; echo
-    [[ ${answer:-y} = [Yy] ]] && solution -a "$number"
-  elif [[ "$1" == "-p" ]]; then
-    # Post solution
-    todo -l
-    read -p "Type a number to post solution for: " number
-    solution -a "$number"
-  elif [[ "$1" == "-s" ]]; then
-    # Show solutions
-    (("$2")) && solution "$2" || solution
-  elif [[ "$1" == "-u" ]]; then
-    # Undo todo
-    sed -nr "/\[x\]/ s/\[x\]\\$//p" "$TODO" | column -ts '$' | less
-    read -p "Type a number to undo: " number
-    echo "Undone item: \"$(awk -F '$' -v number=$number '{if($1==number) print $3}' "$TODO")\""
-    sed -i --follow-symlinks "/^${number}\\$/ s/\[x\]/[ ]/" "$TODO"
-    solution -r "$number"
-  elif [[ "$1" == "-r" ]]; then
-    # Remove todo
-    todo -a
-    read -p "Type a number to remove: " number
-    echo "Removed item: \"$(awk -F '$' -v number=$number '{if($1==number) print $3}' "$TODO")\""
-    sed -i --follow-symlinks "/^${number}\\$/d" "$TODO"
-    solution -r "$number"
-  else
-    # Add todo
-    local max_item_num=$(get_max_item_num)
-    echo "Added item: \"${*}\""
-    printf "%s\n" "$((max_item_num+1))\$[ ]\$${*}" >> "$TODO"
   fi
 }
 
@@ -187,60 +94,6 @@ kp()
   return;
 }
 
-# Get common xpath part for attributes and nodes
-# Parse input parameters into path nodes for xpath
-#
-# INPUT:
-# Provide any number of word-parameters to the script
-#
-# OUTPUT:
-# The result would be multiple strings corresponding found records
-keys()
-{
-  local FILE=~/Projects/scripts/keys.xml
-
-  local xpath_base=""
-  for i in "$@"; do
-    xpath_base="${xpath_base}/*[starts-with(name(), '${i}')]/"
-  done
-  xpath_base="${xpath_base}/keys"
-
-  # Get full command for extracting particular part, whether attribute or node
-  #
-  # INPUT:
-  # $1 = 'attr' / 'node'
-  # $2 = file
-  #
-  # OUTPUT:
-  # string
-  extract_xpath() {
-    case $1 in
-      'attr')
-        local grep_case='".*"'
-        local fs_case='"'
-        ;;
-      'node')
-        local grep_case='>.*<'
-        local fs_case='<|>'
-        ;;
-      *)
-        echo "Wrong parameter"
-        ;;
-    esac
-
-    echo cat "$xpath_base" | xmllint --shell "$2" | sed '/-\+/d' | egrep -o "$grep_case" | tr -d "$fs_case"
-  }
-
-  mapfile -t attributes < <(extract_xpath attr "$FILE")
-  mapfile -t values < <(extract_xpath node "$FILE")
-
-  for (( c=0; c<${#attributes[@]}; c++ )); do
-    echo "${values[$c]}: ${attributes[$c]}"
-  done | column -t -s ':'
-
-  unset attributes values
-}
-
 # Colored man
 man()
 {
@@ -253,15 +106,15 @@ man()
   command man "$@"
 }
 
-# Start new ranger instance only if it is not running in current shell 
-rg() {
-    if [ -z "$RANGER_LEVEL" ]
-    then
-        ranger
-    else
-        exit
-    fi
+# Start new ranger instance only if it is not running in current shell
+r() { [ -z "$RANGER_LEVEL" ] && ranger || exit; }
+
+# Run application in background and remove it from current shell
+runb()
+{
+    app="$1"
+    $1 & 
+    disown
 }
 
 unset get_max_item_num
-unset solution

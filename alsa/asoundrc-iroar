@@ -1,0 +1,10 @@
+pcm.!default {
+  type hw
+  card Go
+  device 0
+}
+
+ctl.!default {
+  type hw
+  card Go
+}

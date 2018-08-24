@@ -1,4 +1,3 @@
-#
 # ~/.bashrc
 #
 
@@ -6,13 +5,13 @@
 [[ $- != *i* ]] && return
 
 # Source alias and functions 
-. ~/Projects/dotfiles/general/alias
-. ~/Projects/dotfiles/general/function
+. ~/.alias
+. ~/.function
 
 PS1='[\u@\h \W]\$ '
 
 # Complete command names
-complete -c man which
+complete -c man which pacman
 
 # Complete command names as well as file names
 complete -cf sudo

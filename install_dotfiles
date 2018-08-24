@@ -1,0 +1,14 @@
+#!/bin/bash
+# Install all the dotfiles, creating symlinks to the right directories
+# Also exlude exception folders
+
+exceptions=( alsa.d )  # skip files in these folders
+
+DOTFILES=~/Projects/dotfiles  # location of all dotfiles
+
+# Go to HOME directory
+cd ~
+
+for f in $(find $DOTFILES ! -path '*/\.*' ! -name "$(basename "$0")" -type f); do
+  [[ ${exceptions[*]} != *$(basename $(dirname "$f" ))* ]] && ln -svf "$f" .$(basename "$f")
+done

@@ -3,8 +3,11 @@
 # ~/.inputrc
 #
 
-# Change double tab to a single tab
+# Change double tab to a single tab for autocomplete
 set show-all-if-unmodified on
 
 # Enable DEL key in applications
 set enable-keypad on
+
+# Ignore case at automcompletion
+set completion-ignore-case on

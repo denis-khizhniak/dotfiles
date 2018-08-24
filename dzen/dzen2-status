@@ -1,1 +1,0 @@
-#SysInfo(Icon+RAM)-->(CPU+RAM+Temp) | Vol(Icon)-->(Value) | Bat(ExtIcon)-->(Value) | Wifi(ExtIcon)-->(Available SSIDs) | Time(Short-Date)-->(Full-Date+Time+Calendar)
