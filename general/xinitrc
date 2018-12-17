@@ -72,13 +72,15 @@ volumeicon &
 #xinput --set-prop 12 --type=float 'libinput Accel Speed' 0.50  # Set A4TECH USB mouse acceleration
 xinput --set-prop 11 --type=float 'libinput Accel Speed' -0.85  # Set MOSART Semi. 2.4G Wireless Mouse
 
+# Start polkit authentication agent
+/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+
 # Solve a rendering issue of Java GUIs
 wmname LG3D &
 
 # Start compositor
-compton --config ~/.compton.conf -b
+#compton --config ~/.compton.conf -b
 
 # Run dwm
 exec startdwm
 #exec bspwm -c ~/.bspwmrc
-

@@ -3,7 +3,7 @@
 # ~/.alias
 #
 
-# File permitions
+# File permissions
 alias chr='chmod 644'
 alias chx='chmod 755'
 alias mx='chmod a+x'
@@ -58,6 +58,13 @@ alias bootinfo='cat /proc/cmdline' # boot parameters
 alias meminfo='cat /proc/meminfo'
 alias cpuinfo='cat /proc/cpu'
 alias oports='netstat -lnp' # opened ports
+alias alsausers='fuser -fv /dev/snd/* /dev/dsp*'
+alias openedstg='cat /proc/asound/card0/pcm0p/sub0/hw_params'
+alias codec='cat /proc/asound/card0/codec#0 | grep Codec'
+alias swaputil='for file in /proc/*/status ; do awk '\''/VmSwap|Name/{printf $2 " " $3} END{ print ""}'\'' $file; done | sort -k 2 -n -r | less 2>&-' # swap utilization
+alias sndmod='cat /proc/asound/modules' # list sound modules
+alias sndcards='cat /proc/asound/cards' # list sound cards
+alias lsmodsnd='lsmod | grep '"'"'Module\|^snd'"'"' | column -t'
 
 # Rebuild package shortcut
 alias redwm='cd ~/Projects/dwm; updpkgsums; makepkg -fi --noconfirm && killall dwm'
@@ -73,8 +80,16 @@ alias cal='cal -m3'
 alias rm='rm -vI'
 alias sctl='systemctl'
 alias sctlu='systemctl --user'
-alias mpvgo='mpv --audio-device=alsa/sysdefault:CARD=Go'
+alias jctl='journalctl'
+alias mpvgo='mpv --audio-device="$(mpv --audio-device=help | grep go | sed -rn "s/\s+'"'"'(.+CARD=\w+).*/\1/p")"'
+alias mpvhdmi='mpv --audio-device="$(mpv --audio-device=help | grep hdmi | sed -rn "s/\s+'"'"'(.+CARD=\w+).*/\1/p")"'
 alias cal='cal -wm'
+alias w='watch'
+alias diff='diff --color'
+alias rm='rm -r'
+alias df='df -h'
+alias jpt='source /opt/anaconda/bin/activate root; jupyter notebook'
+alias lsmod='lsmod | column -t'
 
 # Navidation
 alias ..='cd ..'
@@ -90,6 +105,7 @@ alias gd='git diff'
 alias go='git checkout'
 alias gc='git clone'
 alias gp='git push'
+alias gi='git init'
 
 # Keymap
 alias xev='xev | awk -F'\''[ )]+'\'' '\''/^KeyPress/ { a[NR+2] } NR in a { printf "%-3s %s\n", $5, $8 }'\'''
@@ -102,3 +118,7 @@ alias xprop='xprop | awk '\''
 # Hardware
 alias testmic='arecord -vv -f dat /dev/null'  # test microphone
 alias recplay='arecord --duration=5 --format=dat /tmp/test-mic.wav && aplay /tmp/test-mic.wav'
+
+# Anaconda environment
+alias anaconda-start='source /opt/anaconda/bin/activate root'
+alias anaconda-stop='source /opt/anaconda/bin/deactivate root'

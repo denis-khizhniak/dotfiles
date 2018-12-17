@@ -15,30 +15,26 @@ call vundle#begin()
 
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
-
 " SQL code completion system using the omnifunc framework'
 Plugin 'SQLComplete.vim'
-
 " Provides database access to many dbms (Oracle, Sybase, Microsoft, MySQL, DBI,..)
 Plugin 'dbext.vim'
-
 " Zoom in/out of windows (toggle between one window and multi-window)
 Plugin 'ZoomWin'
-
 " vim-based archiver: builds, extracts, and previews
 Plugin 'Vimball'
-
 " A Git wrapper
 Plugin 'tpope/vim-fugitive'
-
 " A code-completion engine for Vim
 Plugin 'valloric/youcompleteme'
-
 " quoting/parenthesizing made simple
 Plugin 'tpope/vim-surround'
-
 " enable repeating supported plugin maps with "."
 Plugin 'tpope/vim-repeat'
+" gruvbox colorscheme
+Plugin 'morhetz/gruvbox'
+" spacegray colorscheme
+Plugin 'ajh17/spacegray.vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -71,24 +67,15 @@ let g:dbext_default_profile_GLIC_dev2glimssql02_APP41 = 'type=SQLSRV:srvname=dev
 " set default profile
 let g:dbext_default_profile = 'GLIC_dev2glimssql01_sa_APP62'
 
-" ===== Common =====
+" ===== System =====
 " use Vim defaults instead of 100% vi compatibility
 set nocompatible
-" more powerful backspacing
-set backspace=indent,eol,start
 " do not keep a backup file, use versions instead
 set nobackup 
 " display info about commands
 set showcmd
 " display all matching files when we tab complete; show options above command line in autocomplete
 set wildmenu
-" set relative line numbers and automatic toggle
-set number relativenumber
-:augroup numbertoggle
-:  autocmd!
-:  autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
-:  autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
-:augroup END
 " don't redraw while executing macros (good performance config)
 set lazyredraw 
 " codesets and fileformats
@@ -96,8 +83,6 @@ set ffs=unix,dos,mac
 set fencs=utf-8,cp1251,koi8-r,ucs-2,cp866
 " enable filetype plugin
 filetype plugin on              
-" enable syntax highlighting
-syntax on                       
 " fix meta-keys which generate <Esc>a .. <Esc>z
 let chr = 'a'
 while chr <= 'z'
@@ -105,18 +90,36 @@ while chr <= 'z'
     exec "imap \e".chr." <M-".chr.">"
     let chr = nr2char(1+char2nr(chr))
 endw
-" set color scheme
-colorscheme desert
 " time out for key codes
 set ttimeout
 " wait up to 100ms after Esc for special key
 set ttimeoutlen=100
 " set scroll bind option to horisontal by default
-set sbo=hor
+set scrollopt=hor
+set scrollbind
 " copy to system clipboard
 set clipboard=unnamedplus
 " insert the longest common text of all matches; and the menu will come up even if there's only one match
 " set completeopt=longest,menuone
+
+" ===== Look and Feel =====
+" set color scheme
+try
+    colorscheme gruvbox
+catch
+    colorscheme desert
+endtry
+let g:gruvbox_contrast_dark="hard"
+set bg=dark
+" enable syntax highlighting
+syntax on                       
+" set relative line numbers and automatic toggle
+set number relativenumber
+:augroup numbertoggle
+:  autocmd!
+:  autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
+:  autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
+:augroup END
 
 " ===== Dictionaries =====
 " set keymaps for russian keys in normal mode and search, toggle layout by Ctrl+^
@@ -147,26 +150,33 @@ nnoremap <F3> :setlocal spell! spelllang=ru_yo,en_us<CR>
 
 " ===== Autoreplace =====
 " SQL specific bindings
-iab sf select * from
-iab scf select count(1) from
-iab ij join
-iab lj left join
-iab rj right join
-iab fj full join
-iab cj cross join
-iab c1 count(1)
-iab gb group by
-iab ob order by
-iab hcg1 having count(1) > 1
-iab sd select distinct
-iab wh where
-iab nnl is not null
-iab nl is null
-iab sel select
-iab alt alter table
-iab crt create table
-iab drt drop table
-iab df delete from
+func! SetSQLAutoreplaceBindings()
+    iab sf select * from
+    iab scf select count(1) from
+    iab ij join
+    iab lj left join
+    iab rj right join
+    iab fj full join
+    iab cj cross join
+    iab c1 count(1)
+    iab gb group by
+    iab ob order by
+    iab hcg1 having count(1) > 1
+    iab sd select distinct
+    iab wh where
+    iab nnl is not null
+    iab nl is null
+    iab sel select
+    iab alt alter table
+    iab crt create table
+    iab drt drop table
+    iab df delete from
+    iab tt truncate table
+    iab stf select top 100 * from
+    iab selt select top 100
+    iab lk like '%%'
+endfunc
+autocmd BufReadCmd *.sql :call SetSQLAutoreplaceBindings()
 
 " ===== Search =====
 " Search down into subfolders, provides tab-completion for all file-related tasks
@@ -183,7 +193,7 @@ nnoremap <C-L> :nohl<CR><C-L>
 
 " ===== Formatting =====
 " tab settings
-set tabstop=4
+set softtabstop=4
 set shiftwidth=4
 set smarttab
 " use spaces instead of tabs
@@ -194,8 +204,15 @@ set si
 set wrap
 " how many tenths of a second to blink when matching brackets
 set mat=2
+" set a character to show for everything BUT whitespace
+set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
+noremap <F6> :set list!<CR>
+inoremap <F6> <C-o>:set list!<CR>
+cnoremap <F6> <C-c>:set list!<CR>
 
 " ===== Editing =====
+" more powerful backspacing
+set backspace=indent,eol,start
 " use <F11> to toggle between 'paste' and 'nopaste'
 set pastetoggle=<F11>
 " move a line of text using alt+[jk]
@@ -264,8 +281,8 @@ nnoremap <silent> <C-w>w :ZoomWin<CR>
 nnoremap <F5> <Esc>:w<CR>:!./%<CR>
 inoremap <F5> <Esc>:w<CR>:!./%<CR>
 " execute selected
-nnoremap <leader>p :w !python<cr>
-nnoremap <leader>b :w !bash<cr>
+noremap <leader>p :w !python<cr>
+noremap <leader>b :w !bash<cr>
 
 " ===== Navigation =====
 " scroll 40 characters to the right
