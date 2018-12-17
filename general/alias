@@ -106,6 +106,7 @@ alias go='git checkout'
 alias gc='git clone'
 alias gp='git push'
 alias gi='git init'
+alias gl='git log'
 
 # Keymap
 alias xev='xev | awk -F'\''[ )]+'\'' '\''/^KeyPress/ { a[NR+2] } NR in a { printf "%-3s %s\n", $5, $8 }'\'''
