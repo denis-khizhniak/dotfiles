@@ -1,0 +1,5 @@
+# enable copy to clipboard
+set selection-clipboard clipboard
+
+# view the first page on the left side in side-by-side mode
+set first-page-column 1:1

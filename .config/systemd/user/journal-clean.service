@@ -1,0 +1,6 @@
+[Unit]
+Description=Clean old journal entries
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/journalctl --vacuum-time=2weeks

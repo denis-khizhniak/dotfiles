@@ -1,0 +1,6 @@
+# make change folder list the folders of the current mailbox
+macro index 'c' '<change-folder>?<change-dir><home>^K=<enter>'
+
+## Shortcuts for changing the mailbox
+macro index,pager <F2> '<sync-mailbox><enter-command>source ~/.mutt/gmail.com<enter><change-folder>!<enter>'
+macro index,pager <F3> '<sync-mailbox><enter-command>source ~/.mutt/mail.ru<enter><change-folder>!<enter>'

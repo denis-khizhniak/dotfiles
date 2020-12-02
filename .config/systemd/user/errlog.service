@@ -1,0 +1,8 @@
+[Unit]
+Description=Show last error entry from system journal
+
+[Service]
+ExecStart=/usr/bin/notify-send -u critical -c ERR "$(/usr/bin/bash -c 'journalctl -xp err -fb | tail -n1')"
+
+[Install]
+WantedBy=default.target

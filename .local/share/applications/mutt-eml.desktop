@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Open eml files with Mutt
+Comment=IRC Client
+Exec=mutt_open_eml
+StartupNotify=true
+Terminal=true
+Type=Application

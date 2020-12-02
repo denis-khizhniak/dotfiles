@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=App Image Launcher
+Comment=Created to run executables, e.g. AppImage files
+Exec=appimage_wrap
+MimeType=application/x-executable
+

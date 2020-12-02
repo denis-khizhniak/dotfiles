@@ -1,0 +1,88 @@
+source ~/.mutt/colors
+source ~/.mutt/macros
+
+
+#### General settings
+# Store message headers locally to speed things up.
+# If hcache is a folder, Mutt will create sub cache folders for each account which may speeds things up even more.
+set header_cache = ~/.cache/mutt
+
+# Store messages locally to speed things up, like searching message bodies.
+# Can be the same folder as header_cache.
+# This will cost important disk usage according to your e-mail amount.
+set message_cachedir = "~/.cache/mutt"
+
+# Allow Mutt to open a new IMAP connection automatically.
+unset imap_passive
+
+# Keep the IMAP connection alive by polling intermittently (time in seconds).
+set imap_keepalive = 300
+
+# How often to check for new mail (time in seconds).
+set mail_check = 120
+
+# set date_format="%d %b %R"
+set index_format="%4C %Z %D %-15.15L (%4l) %s"
+
+# check for all subscribed IMAP folders
+set imap_check_subscribed
+
+# show context lines when going to next page
+set pager_context = 3
+
+# stop at the end instead of displaying next mail
+set pager_stop = yes
+
+# fast reply (no confirmation of the recipient and the subject) and include the original mail in the answer
+set fast_reply = yes
+set include = yes
+
+# enable threading
+set sort = reverse-threads
+set strict_threads = yes
+
+# sort threads according to the date of their last e-mail
+set sort_aux=last-date-received
+
+# unicode characters in attachements
+set rfc2047_parameters = yes
+
+# settings for html emails
+set mailcap_path = ~/.mutt/mailcap
+auto_view text/html
+
+# make mutt default to text when available
+alternative_order text/plain text/html
+
+# bind a key to fallback to a graphical browser
+macro attach 'V' "<pipe-entry>iconv -c --to-code=UTF8 > ~/.cache/mutt/mail.html<enter><shell-escape>$BROWSER ~/.cache/mutt/mail.html<enter>"
+
+
+# key bindings
+bind pager j next-line
+bind pager k previous-line
+bind attach,index,pager \CD next-page
+bind attach,index,pager \CU previous-page
+bind pager g top
+bind pager G bottom
+bind attach,index g first-entry
+bind attach,index G last-entry
+
+
+# collapse threads 
+bind index - collapse-thread
+bind index _ collapse-all
+
+
+## Mail.ru account
+source "~/.mutt/mail.ru"
+folder-hook $folder 'source ~/.mutt/mail.ru'
+
+
+## Gmail.com account
+source "~/.mutt/gmail.com"
+folder-hook $folder 'source ~/.mutt/gmail.com'
+
+
+## Hook
+account-hook $folder "set imap_user=$imap_user imap_pass=$imap_pass"

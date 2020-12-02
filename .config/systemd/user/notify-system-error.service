@@ -1,0 +1,8 @@
+[Unit]
+Description=Notify about system error
+
+[Service]
+ExecStart=journalctl -xep err.alert -n1 | grep -ve "--"
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,8 @@
+[Unit]
+Description=Notify about low battery level
+
+[Service]
+ExecStart=/home/den/.bin/notify_low_battery
+
+[Install]
+WantedBy=default.target

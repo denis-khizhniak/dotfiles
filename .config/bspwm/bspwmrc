@@ -1,0 +1,81 @@
+#! /bin/sh
+
+# ===== Launch bar and keyboard manager ===== {{{
+sxhkd &
+$HOME/.config/polybar/launch.sh 2>/var/log/polybar.log
+# ===== Launch bar and keyboard manager ===== }}}
+# ===== Geometries ===== {{{
+# Get display geometry
+eval $(xdotool getdisplaygeometry --shell)
+display_width=$WIDTH
+display_height=$HEIGHT
+
+# Get bar height
+bar_name=top
+bar_height=$(polybar -d height "$bar_name")
+
+# Set border
+border=2
+
+# xclock window geometry
+xclock_width=86
+xclock_height=35
+
+# gsimplecal window geometry
+gsimplecal_width=190
+gsimplecal_height=150
+
+# Set xclock rectangle string
+xclock_rect_str="${xclock_width}x${xclock_height}+$((display_width-xclock_width-2*border))+$((4*border+bar_height))"
+
+# Set gsimplecal rectangle string
+gsimplecal_rect_str="${gsimplecal_width}x${gsimplecal_height}+$((display_width-gsimplecal_width-2*border))+$((4*border+bar_height))"
+# ===== Geometries ===== }}}
+# ===== General ===== {{{
+bspc monitor -d I II III IV V VI
+bspc config split_ratio 0.50
+bspc config single_monocle false
+# ===== General ===== }}}
+# ===== Borders and gaps ===== {{{
+bspc config border_width $border
+bspc config window_gap 0
+bspc config bottom_padding 0
+bspc config top_padding -5
+bspc config borderless_monocle true
+bspc config gapless_monocle true
+# ===== Borders and gaps ===== }}}
+# ===== Focus ===== {{{
+bspc config focus_follows_pointer true
+# ===== Focus ===== }}}
+# ===== Border colors ===== {{{
+bspc config normal_border_color "#484848"
+bspc config focused_border_color "#ffb52a"
+# ===== Border colors ===== }}}
+# ===== Application rules ===== {{{
+bspc rule -a krita desktop='^4' state=floating follow=on
+bspc rule -a Gimp desktop='^4' state=floating follow=on
+bspc rule -a Chromium desktop='^2' follow=on focus=on
+bspc rule -a qutebrowser state=tiled desktop='^2' follow=on focus=on
+bspc rule -a URxvt desktop='^1' follow=on focus=on
+bspc rule -a Termite desktop='^1' follow=on focus=on
+bspc rule -a Skype desktop='^5' follow=on focus=on
+bspc rule -a Pidgin desktop='^5' follow=on focus=on state=tiled
+bspc rule -a "Microsoft Teams - Preview" desktop='^5' follow=on focus=on
+bspc rule -a zoom desktop='^5' follow=on focus=on
+bspc rule -a Darktable desktop='^4' follow=on focus=on
+bspc rule -a Rawtherapee desktop='^4' follow=on focus=on
+bspc rule -a digikam desktop='^4' follow=on focus=on
+bspc rule -a XMind desktop='^3' follow=on focus=on
+bspc rule -a Soffice state=tiled follow=on focus=on
+bspc rule -a libreoffice-starter follow=on focus=on
+bspc rule -a Anki desktop='^3' follow=on focus=on
+bspc rule -a Inkscape desktop='^3' follow=on focus=on
+bspc rule -a Evince state=tiled
+bspc rule -a Anydesk desktop='^5' follow=on focus=on
+bspc rule -a XClock state=floating rectangle=$xclock_rect_str
+bspc rule -a Gsimplecal state=floating rectangle=$gsimplecal_rect_str
+bspc rule -a Connman-gtk state=floating
+bspc rule -a Kodi desktop='^6' follow=on focus=on
+bspc rule -a Zathura state=tiled follow=on focus=on
+bspc rule -a Vmplayer desktop='^6' follow=on focus=on
+# ===== Application rules =====

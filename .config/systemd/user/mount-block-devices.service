@@ -1,0 +1,8 @@
+[Unit]
+Description=Monitor for new block devices and mount them
+
+[Service]
+ExecStart= /home/den/.bin/mount_block_devices
+
+[Install]
+WantedBy=default.target

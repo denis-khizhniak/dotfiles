@@ -1,0 +1,8 @@
+[Unit]
+Description=Xresources changes monitoring
+
+[Path]
+PathModified=/home/den/.Xresources
+
+[Install]
+WantedBy=multi-user.target

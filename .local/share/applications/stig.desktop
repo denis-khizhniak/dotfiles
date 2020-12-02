@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Stig
+Comment=TUI and CLI for the BitTorrent client Transmission
+Terminal=true
+Exec=urxvt -e stig add %U
+Type=Application
+MimeType=application/x-bittorrent
+Categories=Network;FileTransfer;P2P;
+Keywords=p2p;bittorrent;transmission;rpc;

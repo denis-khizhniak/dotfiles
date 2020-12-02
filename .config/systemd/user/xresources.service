@@ -1,0 +1,6 @@
+[Unit]
+Description=Xresources changes monitoring
+
+[Service]
+Type=oneshot
+ExecStart=systemctl --user restart dunst ; polybar-msg cmd restart

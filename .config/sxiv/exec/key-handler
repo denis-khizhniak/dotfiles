@@ -1,0 +1,34 @@
+#!/usr/bin/env sh
+
+# ^X-^R: prompt for new image name (needs `dmenu`) and `mv`
+# ^X-^C: copy the image to X clipboard (needs `xclip`)
+# ^X-^P: copy the image path to X clipboard (needs `xclip`)
+# ^X-^D: delete the image
+# ^X-^E: edit the image in image editor
+
+# Example zenity prompt:
+#   name="$(zenity --entry --display=:0.0 --text "rename $file to")" 2> /dev/null
+
+while read -r file
+do
+    case "$1" in
+        "C-r")
+                name="$(dmenu -p "rename $file to")" 2> /dev/null
+                if ! [ -z "$name" ]; then
+                    mv "$file" "$(dirname "$file")"/"$name"
+                fi
+                ;;
+        "C-c")
+                xclip -selection clipboard -t $(xdg-mime query filetype "$file") "$file" ;;
+        "C-p")
+                printf "%s" "$file" | xclip -selection clipboard ;;
+        "C-x")
+                rm "$file" ;;
+        "C-e")
+                krita "$file" ;;
+        *)
+                printf "Sorry, I don't understand"
+                exit 1
+                ;;
+    esac
+done

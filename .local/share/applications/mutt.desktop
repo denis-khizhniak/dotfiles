@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Mutt
+Comment=IRC Client
+Exec=urxvt -e mutt
+StartupNotify=true
+Terminal=true
+Type=Application
