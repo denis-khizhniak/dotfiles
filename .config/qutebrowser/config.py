@@ -5,11 +5,7 @@
 config.load_autoconfig()
 # ===== Settings ===== }}}
 # ===== KEYS ===== {{{
-config.bind(",m", "spawn mpv {url}")
-config.bind(",M", "hint links spawn mpv {hint-url}")
-
 config.bind(",m", "spawn umpv {url}")
-config.bind(",M", "hint links spawn umpv {hint-url}")
 config.bind(";M", "hint --rapid links spawn umpv {hint-url}")
 config.bind("<Ctrl-y>", "prompt-yes", mode="prompt")
 config.bind("K", "tab-next")
@@ -26,6 +22,7 @@ config.bind("dk", "tab-only --prev")
 config.bind("dj", "tab-only --next")
 config.bind(',p', 'spawn --userscript qute-pass --dmenu-invocation dmenu')
 config.bind(',P', 'spawn --userscript qute-pass --dmenu-invocation dmenu --password-only')
+config.bind('gP', 'back -t')
 # ===== KEYS ===== }}}
 # ===== key mappings ===== {{{
 c.bindings.key_mappings = {
