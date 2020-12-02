@@ -1,7 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname "$0")"/.nnn-plugin-helper
 
-echo "directory is $1" > ~/info.txt
-echo "here" >> ~/info.txt
 nnn_cd "$(dirname $(readlink -fn "$1"))" 0
-echo "and here" >> ~/info.txt

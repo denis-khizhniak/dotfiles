@@ -15,10 +15,13 @@ fi
 # Source ls colors
 # . /usr/share/LS_COLORS/dircolors.sh
 . ~/.local/share/lscolors.sh
+
+# Source Git prompt
+. /usr/share/git/completion/git-prompt.sh
 # ===== Source files ===== }}}
 # ===== Environment ===== {{{
 # Set prompt
-PS1="[\h@\u \W] "
+PS1='[\u@\h \W$(__git_ps1 " (%s)")]\$ '
 
 # Set journalctl to wrap lines instead of truncating
 export SYSTEMD_LESS=FRXMK
@@ -81,7 +84,7 @@ export NNN_PLUG='b:oldbigfile;'\
 'h:-treeview;'\
 'i:-imgview;'\
 'j:fzcd;'\
-'l:-_git log;'\
+'l:-gitlog;'\
 'k:-_fuser -kiv $nnn*;'\
 'm:-mp3conv;'\
 'o:-fzopen;'\
