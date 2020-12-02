@@ -1,7 +1,0 @@
-#!/bin/sh
-#
-# ~/.xserverrc
-#
-
-# Start X on the same virtual terminal where the login occured
-exec /usr/bin/X -nolisten tcp "$@" vt$XDG_VTNR
