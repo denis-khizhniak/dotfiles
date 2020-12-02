@@ -154,7 +154,7 @@ alias cdm='cd /media'
 # ===== Git ===== {{{
 alias gs='git status'
 alias ga='git add'
-alias gb='git branch '
+alias gb='git branch'
 alias gcm='git commit'
 alias gcma='git commit -am'
 alias gd='git diff'
@@ -163,7 +163,8 @@ alias gc='git clone'
 alias gp='git push'
 alias gi='git init'
 alias gl='git log'
-alias gr='git rm'
+alias grm='git rm'
+alias gra='git remote add origin'
 # ===== Git ===== }}}
 # ===== Keymap ===== {{{
 alias xev=$'xev | awk -F\'[ )]+\' \'/^KeyPress/ { a[NR+2] } NR in a { printf "%-3s %s\\n", $5, $8 }\''
