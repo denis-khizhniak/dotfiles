@@ -143,6 +143,7 @@ alias fwc='firewall-cmd'
 alias lstr='trash-list'
 alias rmtr='trash-rm'
 alias restr='trash-restore'
+alias cltr='trash-empty'
 # ===== Handy shortcuts ===== }}}
 # ===== Run nnn with sudo ===== {{{
 alias N='sudo nnn -er'
