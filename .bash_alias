@@ -32,8 +32,8 @@ alias pss='yay -Ss'
 alias fhere='find . -name ' # find by name in current dir
 alias mkdir='mkdir -pv'
 alias ftoday='ls -al --time-style=+%D | grep $(date +%D)' # find changed today files
-alias cp='advcp -g'
-alias mv='advmv -g'
+alias cp='/usr/bin/advcp -g'
+alias mv='/usr/bin/advmv -g'
 # ===== File management ===== }}}
 # ===== Process management ===== {{{
 alias psg='ps aux | grep -v grep | grep -i -e VSZ -e' # find process by name
