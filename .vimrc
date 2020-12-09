@@ -72,6 +72,9 @@ Plug 'christoomey/vim-tmux-navigator'
 " gruvbox theme
 Plug 'morhetz/gruvbox'
 
+Plug 'moll/vim-bbye'
+Plug 'aymericbeaumet/vim-symlink'
+
 call plug#end()
 " ===== Plugins ===== }}}
 " ===== System ===== {{{
@@ -556,14 +559,6 @@ nnoremap <leader>n :NnnPicker '%:p:h'<CR>
 " Opens the nnn window in a split
 let g:nnn#layout = 'new'
 " ===== nnn ===== }}}
-" ===== fugitive ===== {{{
-nnoremap <leader>s :call FindFugitive()<CR>
-function! FindFugitive()
-    if !exists('b:git_dir')
-        call FugitiveDetect(fnameescape(resolve(expand('%:p'))))
-    endif
-endfunction
-" ===== fugitive ===== }}}
 " ===== gruvbox ===== {{{
 autocmd vimenter * ++nested colorscheme gruvbox
 " ===== gruvbox ===== }}}
